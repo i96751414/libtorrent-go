@@ -26,7 +26,16 @@ namespace libtorrent
 {
     typedef int64_t size_type;
     class ptime;
+    class time_duration;
 }
+
+%rename("%(camelcase)s", %$isclass) ""; 
+%rename("%(camelcase)s", %$isvariable) ""; 
+%rename("%(camelcase)s", %$isenumitem) ""; 
+%rename("%(camelcase)s", %$isenum) ""; 
+%rename("%(camelcase)s", %$istemplate) ""; 
+%rename("%(camelcase)s", %$isfunction) "";
+%rename("%(camelcase)s", %$isnamespace) "";
 
 // These are problematic, ignore them for now
 %ignore libtorrent::absolutetime_nodeprecate_;
@@ -57,6 +66,7 @@ namespace libtorrent
 %include <libtorrent/address.hpp>
 %include "torrent_info.i"
 %include <libtorrent/session_settings.hpp>
+%include "peer_info.i"
 %include "torrent_handle.i"
 %include <libtorrent/session_status.hpp>
 %include <libtorrent/add_torrent_params.hpp>
@@ -66,5 +76,6 @@ namespace libtorrent
 %include <libtorrent/time.hpp>
 %include "session.i"
 %include "create_torrent.i"
+%include "add_torrent_params.i"
 %include "ed25519.i"
 %include "dht.i"

@@ -1,10 +1,10 @@
 NAME = libtorrent-go
-GO_PACKAGE = github.com/steeve/$(NAME)
+GO_PACKAGE = github.com/anteo/$(NAME)
 CC = cc
 CXX = c++
 PKG_CONFIG = pkg-config
 DOCKER = docker
-DOCKER_IMAGE = steeve/$(NAME)
+DOCKER_IMAGE = anteo/$(NAME)
 PLATFORMS = android-arm \
 			darwin-x64 \
 			linux-x86 \
@@ -72,17 +72,20 @@ OUT_LIBRARY_SHARED = $(OUT_PATH)/$(GO_PACKAGE).dll
 SONAME = $(shell basename $(OUT_LIBRARY_SHARED))
 endif
 
-all: install
+.PHONY: $(PLATFORMS)
+
+all: $(PLATFORMS)
+
+$(PLATFORMS):
+	$(DOCKER) run -i --rm -v $(HOME):$(HOME) -v /tmp:/tmp -t -e GOPATH=$(GOPATH) -w $(shell pwd) $(DOCKER_IMAGE):$@ make re;
 
 ifeq ($(TARGET_OS), windows)
-install: install_all fix_windows
+build: build_all fix_windows
 else
-install: install_all
+build: build_all
 endif
 
-.PHONY: dockerbuild
-
-install_all:
+build_all:
 	SWIG_FLAGS='$(CC_DEFINES) $(LIBTORRENT_CFLAGS)' \
 	SONAME=$(SONAME) \
 	CC=$(CC) CXX=$(CXX) \
@@ -105,14 +108,9 @@ fix_windows:
 clean:
 	rm -rf $(OUT_LIBRARY) $(OUT_LIBRARY_SHARED)
 
-re: clean all
+re: clean build
 
-build-envs:
+env:
 	for i in $(PLATFORMS); do \
 		$(DOCKER) build -t $(DOCKER_IMAGE):$$i $$i ; \
-	done
-
-alldist:
-	for i in $(PLATFORMS); do \
-		$(DOCKER) run -i --rm -v $(HOME):$(HOME) -t -e GOPATH=$(shell go env GOPATH) -w $(shell pwd) $(DOCKER_IMAGE):$$i make re; \
 	done
