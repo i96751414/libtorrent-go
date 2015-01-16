@@ -22,24 +22,6 @@ RUN curl -L http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | ta
     make && make install && \
     rm -rf `pwd`
 
-# Install libtorrent
-ENV LIBTORRENT_VERSION 1.0.3
-RUN curl -L http://sourceforge.net/projects/libtorrent/files/libtorrent/libtorrent-rasterbar-${LIBTORRENT_VERSION}.tar.gz/download | tar xvz && \
-    cd libtorrent-rasterbar-${LIBTORRENT_VERSION}/ && \
-    sed -i 's/$PKG_CONFIG openssl --libs-only-/$PKG_CONFIG openssl --static --libs-only-/' ./configure && \
-    sed -i -e s/Windows.h/windows.h/ -e s/Wincrypt.h/wincrypt.h/ ./ed25519/src/seed.cpp && \
-    \
-    PKG_CONFIG_PATH=${CROSS_ROOT}/lib/pkgconfig/ \
-    CC=${CROSS_TRIPLE}-gcc CXX=${CROSS_TRIPLE}-g++ \
-    CFLAGS="${CFLAGS} -O2 -DINT64_MAX=0x7fffffffffffffffLL -DINT16_MAX=32767 -DINT16_MIN=-32768" \
-    CXXFLAGS="${CXXFLAGS} ${CFLAGS}" \
-    ./configure --enable-static --disable-shared --disable-pool-allocators --disable-deprecated-functions \
-    --host=${CROSS_TRIPLE} --prefix=${CROSS_ROOT} \
-    --with-boost=${CROSS_ROOT} --with-boost-libdir=${CROSS_ROOT}/lib && \
-    \
-    make && make install && \
-    rm -rf `pwd`
-
 # Install SWIG
 # Need to build from >3.0.2 because Go 1.4
 ENV SWIG_VERSION 5c57a8c877f88c9388b68067d665c63546244ba0
@@ -58,6 +40,25 @@ RUN cd /usr/local && \
     cd /usr/local/go/src && \
     CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=android GOARCH=arm GOARM=7 CGO_ENABLED=1 ./make.bash
 ENV PATH ${PATH}:/usr/local/go/bin
+
+# Install libtorrent
+ENV LIBTORRENT_VERSION 1.0.3
+RUN echo "#define BOOST_SP_USE_PTHREADS" >> ${CROSS_ROOT}/include/boost/config/user.hpp
+RUN curl -L http://sourceforge.net/projects/libtorrent/files/libtorrent/libtorrent-rasterbar-${LIBTORRENT_VERSION}.tar.gz/download | tar xvz && \
+    cd libtorrent-rasterbar-${LIBTORRENT_VERSION}/ && \
+    sed -i 's/$PKG_CONFIG openssl --libs-only-/$PKG_CONFIG openssl --static --libs-only-/' ./configure && \
+    sed -i -e s/Windows.h/windows.h/ -e s/Wincrypt.h/wincrypt.h/ ./ed25519/src/seed.cpp && \
+    \
+    PKG_CONFIG_PATH=${CROSS_ROOT}/lib/pkgconfig/ \
+    CC=${CROSS_TRIPLE}-gcc CXX=${CROSS_TRIPLE}-g++ \
+    CFLAGS="${CFLAGS} -O2 -DINT64_MAX=0x7fffffffffffffffLL -DINT16_MAX=32767 -DINT16_MIN=-32768 -DTORRENT_PRODUCTION_ASSERTS" \
+    CXXFLAGS="${CXXFLAGS} ${CFLAGS}" \
+    ./configure --enable-static --disable-shared --disable-pool-allocators --disable-deprecated-functions \
+    --host=${CROSS_TRIPLE} --prefix=${CROSS_ROOT} \
+    --with-boost=${CROSS_ROOT} --with-boost-libdir=${CROSS_ROOT}/lib && \
+    \
+    make && make install && \
+    rm -rf `pwd`
 
 WORKDIR /
 RUN rm -rf /build
