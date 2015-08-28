@@ -23,7 +23,7 @@ RUN curl -L http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | ta
     rm -rf `pwd`
 
 # Install SWIG
-# Need to build from >3.0.2 because Go 1.4
+# Need to build from >3.0.2 because Go 1.4.2
 ENV SWIG_VERSION 5c57a8c877f88c9388b68067d665c63546244ba0
 RUN apt-get update && apt-get install -y automake libpcre3-dev bison yodl
 RUN curl -L https://github.com/swig/swig/archive/${SWIG_VERSION}.tar.gz | tar xvz && \
@@ -34,7 +34,7 @@ RUN curl -L https://github.com/swig/swig/archive/${SWIG_VERSION}.tar.gz | tar xv
     rm -rf `pwd`
 
 # Install Golang
-ENV GO_VERSION 1.4
+ENV GO_VERSION 1.4.2
 RUN cd /usr/local && \
     curl -L http://golang.org/dl/go${GO_VERSION}.src.tar.gz | tar xvz && \
     cd /usr/local/go/src && \
