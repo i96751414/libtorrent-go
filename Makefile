@@ -12,7 +12,7 @@ PLATFORMS = android-arm \
 			linux-arm \
 			windows-x86 \
 			windows-x64
-PLATFORMS = windows-x86
+
 include platform_host.mk
 
 ifneq ($(CROSS_TRIPLE),)
@@ -77,7 +77,7 @@ endif
 all: $(PLATFORMS)
 
 $(PLATFORMS):
-	$(DOCKER) run -i --rm -v $(HOME):$(HOME) -v /tmp:/tmp -t -e GOPATH=$(GOPATH) -w $(shell pwd) $(DOCKER_IMAGE):$@ make re;
+	$(DOCKER) run --rm -v $(HOME):$(HOME) -v /tmp:/tmp -e GOPATH=$(GOPATH) -w $(shell pwd) $(DOCKER_IMAGE):$@ make re;
 
 ifeq ($(TARGET_OS), windows)
 build: build_all fix_windows
