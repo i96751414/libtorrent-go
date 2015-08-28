@@ -12,7 +12,7 @@ PLATFORMS = android-arm \
 			linux-arm \
 			windows-x86 \
 			windows-x64
-
+PLATFORMS = windows-x86
 include platform_host.mk
 
 ifneq ($(CROSS_TRIPLE),)
