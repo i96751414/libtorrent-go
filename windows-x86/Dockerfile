@@ -1,5 +1,5 @@
-FROM steeve/cross-compiler:windows-x86
-MAINTAINER Steeve Morin "steeve.morin@gmail.com"
+FROM anteo/cross-compiler:windows-x86
+MAINTAINER Anton Argirov "anton.argirov@gmail.com"
 
 RUN mkdir -p /build
 WORKDIR /build
@@ -45,25 +45,28 @@ RUN curl -L http://sourceforge.net/projects/libtorrent/files/libtorrent/libtorre
     make && make install && \
     rm -rf `pwd`
 
+# Install Golang
+ENV BOOTSTRAP_GO_VERSION go1.4.2
+ENV GO_VERSION 17a256bf22352c2beb9fc25ff76462fb16f3e6b2
+RUN cd /usr/local && \
+    curl -L https://github.com/golang/go/archive/${BOOTSTRAP_GO_VERSION}.tar.gz | tar xvz && \
+    cd /usr/local/go-${BOOTSTRAP_GO_VERSION}/src && \
+    CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=windows GOARCH=386 CGO_ENABLED=1 ./make.bash
+RUN cd /usr/local && \
+    curl -L https://github.com/golang/go/archive/${GO_VERSION}.tar.gz | tar xvz
+RUN cd /usr/local/go-${GO_VERSION}/src && \
+	echo go1.6beta > /usr/local/go-${GO_VERSION}/VERSION && \
+    GOROOT_BOOTSTRAP=/usr/local/go-${BOOTSTRAP_GO_VERSION} CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=windows GOARCH=386 CGO_ENABLED=1 ./make.bash
+ENV PATH ${PATH}:/usr/local/go-${GO_VERSION}/bin
+
 # Install SWIG
-# Need to build from >3.0.2 because Go 1.4.2
-ENV SWIG_VERSION 5c57a8c877f88c9388b68067d665c63546244ba0
+ENV SWIG_VERSION 3.0.7
 RUN apt-get update && apt-get install -y automake libpcre3-dev bison yodl
-RUN curl -L https://github.com/swig/swig/archive/${SWIG_VERSION}.tar.gz | tar xvz && \
-    cd swig-${SWIG_VERSION}/ && \
-    curl -L https://github.com/steeve/swig/compare/swig:${SWIG_VERSION}...packed-struct-libtorrent.diff | patch -p1 && \
-    curl -L https://github.com/steeve/swig/compare/swig:${SWIG_VERSION}...fix-windows.diff | patch -p1 && \
+RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | tar xvz
+RUN cd swig-rel-${SWIG_VERSION}/ && \
     ./autogen.sh && \
     ./configure && make && make install && \
     rm -rf `pwd`
-
-# Install Golang
-ENV GO_VERSION 1.4.2
-RUN cd /usr/local && \
-    curl -L http://golang.org/dl/go${GO_VERSION}.src.tar.gz | tar xvz && \
-    cd /usr/local/go/src && \
-    CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=windows GOARCH=386 CGO_ENABLED=1 ./make.bash
-ENV PATH ${PATH}:/usr/local/go/bin
-
+    
 WORKDIR /
 RUN rm -rf /build

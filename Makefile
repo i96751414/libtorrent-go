@@ -67,10 +67,6 @@ endif
 
 OUT_PATH = $(shell go env GOPATH)/pkg/$(GOOS)_$(GOARCH)
 OUT_LIBRARY = $(OUT_PATH)/$(GO_PACKAGE).a
-ifeq ($(TARGET_OS), windows)
-OUT_LIBRARY_SHARED = $(OUT_PATH)/$(GO_PACKAGE).dll
-SONAME = $(shell basename $(OUT_LIBRARY_SHARED))
-endif
 
 .PHONY: $(PLATFORMS)
 
@@ -79,15 +75,8 @@ all: $(PLATFORMS)
 $(PLATFORMS):
 	$(DOCKER) run --rm -v $(HOME):$(HOME) -v /tmp:/tmp -e GOPATH=$(GOPATH) -w $(shell pwd) $(DOCKER_IMAGE):$@ make re;
 
-ifeq ($(TARGET_OS), windows)
-build: build_all fix_windows
-else
-build: build_all
-endif
-
-build_all:
+build:
 	SWIG_FLAGS='$(CC_DEFINES) $(LIBTORRENT_CFLAGS)' \
-	SONAME=$(SONAME) \
 	CC=$(CC) CXX=$(CXX) \
 	PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) \
 	CGO_ENABLED=1 \
@@ -95,18 +84,8 @@ build_all:
 	PATH=.:$$PATH \
 	go install -v -x
 
-fix_windows:
-	mv $(OUT_LIBRARY) $(OUT_LIBRARY).raw
-	cd `mktemp -d` && \
-		pwd && \
-		ar x $(OUT_LIBRARY).raw && \
-		go tool pack r $(OUT_LIBRARY) `ar t $(OUT_LIBRARY).raw | grep -v _wrap` && \
-		$(CXX) -shared -static-libgcc -static-libstdc++ -o $(OUT_LIBRARY_SHARED) *_wrap $(LIBTORRENT_LDFLAGS) && \
-		rm -rf `pwd`
-	rm -rf $(OUT_LIBRARY).raw
-
 clean:
-	rm -rf $(OUT_LIBRARY) $(OUT_LIBRARY_SHARED)
+	rm -rf $(OUT_LIBRARY)
 
 re: clean build
 
