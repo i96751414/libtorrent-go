@@ -1,11 +1,12 @@
-FROM steeve/cross-compiler:linux-x86
-MAINTAINER Steeve Morin "steeve.morin@gmail.com"
+FROM cross-compiler:linux-x86
+
+RUN apt-get update && apt-get install -y automake libpcre3-dev bison yodl wget
 
 RUN mkdir -p /build
 WORKDIR /build
 
 # Install Boost.System
-ENV BOOST_VERSION 1.58.0
+ENV BOOST_VERSION 1.60.0
 RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`.tar.bz2/download | tar xvj && \
     cd boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`/ && \
     ./bootstrap.sh --prefix=${CROSS_ROOT} && \
@@ -15,7 +16,7 @@ RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/b
     rm -rf `pwd`
 
 # Install OpenSSL
-ENV OPENSSL_VERSION 1.0.2c
+ENV OPENSSL_VERSION 1.0.2e
 RUN curl -L http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xvz && \
     cd openssl-${OPENSSL_VERSION}/ && \
     CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared linux-elf --prefix=${CROSS_ROOT} && \
@@ -23,13 +24,13 @@ RUN curl -L http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | ta
     rm -rf `pwd`
 
 # Install libtorrent
-ENV LIBTORRENT_VERSION 1.0.5
-RUN curl -L http://sourceforge.net/projects/libtorrent/files/libtorrent/libtorrent-rasterbar-${LIBTORRENT_VERSION}.tar.gz/download | tar xvz && \
+ENV LIBTORRENT_VERSION 1.0.7
+RUN wget -nc https://github.com/arvidn/libtorrent/releases/download/libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`/libtorrent-rasterbar-${LIBTORRENT_VERSION}.tar.gz && \
+    tar xf libtorrent-rasterbar-${LIBTORRENT_VERSION}.tar.gz && \
     cd libtorrent-rasterbar-${LIBTORRENT_VERSION}/ && \
     sed -i 's/$PKG_CONFIG openssl --libs-only-/$PKG_CONFIG openssl --static --libs-only-/' ./configure && \
     sed -i -e s/Windows.h/windows.h/ -e s/Wincrypt.h/wincrypt.h/ ./ed25519/src/seed.cpp && \
     \
-    PKG_CONFIG_PATH=${CROSS_ROOT}/lib/pkgconfig/ \
     CC=${CROSS_TRIPLE}-gcc CXX=${CROSS_TRIPLE}-g++ \
     CFLAGS="${CFLAGS} -O2" \
     CXXFLAGS="${CXXFLAGS} ${CFLAGS}" \
@@ -42,8 +43,7 @@ RUN curl -L http://sourceforge.net/projects/libtorrent/files/libtorrent/libtorre
 
 # Install SWIG
 # Need to build from >3.0.2 because Go 1.4.2
-ENV SWIG_VERSION 5c57a8c877f88c9388b68067d665c63546244ba0
-RUN apt-get update && apt-get install -y automake libpcre3-dev bison yodl
+ENV SWIG_VERSION rel-3.0.4
 RUN curl -L https://github.com/swig/swig/archive/${SWIG_VERSION}.tar.gz | tar xvz && \
     cd swig-${SWIG_VERSION}/ && \
     curl -L https://github.com/steeve/swig/compare/swig:${SWIG_VERSION}...packed-struct-libtorrent.diff | patch -p1 && \
@@ -52,7 +52,7 @@ RUN curl -L https://github.com/swig/swig/archive/${SWIG_VERSION}.tar.gz | tar xv
     rm -rf `pwd`
 
 # Install Golang
-ENV GO_VERSION 1.4.2
+ENV GO_VERSION 1.4.3
 RUN cd /usr/local && \
     curl -L http://golang.org/dl/go${GO_VERSION}.src.tar.gz | tar xvz && \
     cd /usr/local/go/src && \

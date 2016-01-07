@@ -1,10 +1,10 @@
 NAME = libtorrent-go
-GO_PACKAGE = github.com/steeve/$(NAME)
+GO_PACKAGE = github.com/i96751414/$(NAME)
 CC = cc
 CXX = c++
 PKG_CONFIG = pkg-config
 DOCKER = docker
-DOCKER_IMAGE = steeve/$(NAME)
+DOCKER_IMAGE = $(NAME)
 PLATFORMS = android-arm \
 			darwin-x64 \
 			linux-x86 \
