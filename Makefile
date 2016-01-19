@@ -1,10 +1,10 @@
 NAME = libtorrent-go
-GO_PACKAGE = github.com/anteo/$(NAME)
+GO_PACKAGE = github.com/dimitriss/$(NAME)
 CC = cc
 CXX = c++
 PKG_CONFIG = pkg-config
 DOCKER = docker
-DOCKER_IMAGE = anteo/$(NAME)
+DOCKER_IMAGE = dimitriss/$(NAME)
 PLATFORMS = android-arm \
 			darwin-x64 \
 			linux-x86 \
