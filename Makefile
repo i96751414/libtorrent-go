@@ -112,7 +112,10 @@ build-envs:
 		$(DOCKER) build -t $(DOCKER_IMAGE):$$i $$i ; \
 	done
 
+dist:
+	$(DOCKER) run --rm -v $(GOPATH):/go -e GOPATH=/go -v $(shell pwd):/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) $(DOCKER_IMAGE):$(PLATFORM) make re
+
 alldist:
 	for i in $(PLATFORMS); do \
-		$(DOCKER) run --rm -v $(HOME):$(HOME) -e GOPATH=$(shell go env GOPATH) -w $(shell pwd) $(DOCKER_IMAGE):$$i make re; \
+		$(MAKE) dist PLATFORM=$$i; \
 	done
