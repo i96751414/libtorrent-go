@@ -40,6 +40,7 @@ else ifeq ($(TARGET_OS), linux)
 else ifeq ($(TARGET_OS), android)
 	GOOS = android
 	GOARM = 7
+	GO_LDFLAGS = -extldflags=-pie
 endif
 
 ifneq ($(CROSS_ROOT),)
@@ -90,7 +91,7 @@ install_all:
 	CGO_ENABLED=1 \
 	GOOS=$(GOOS) GOARCH=$(GOARCH) GOARM=$(GOARM) \
 	PATH=.:$$PATH \
-	go install -v -x
+	go install -v -ldflags '$(GO_LDFLAGS)' -x
 
 fix_windows:
 	mv $(OUT_LIBRARY) $(OUT_LIBRARY).raw
