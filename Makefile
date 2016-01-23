@@ -108,9 +108,12 @@ clean:
 
 re: clean all
 
+build:
+	$(DOCKER) build -t $(DOCKER_IMAGE):$(PLATFORM) $(PLATFORM)
+
 build-envs:
 	for i in $(PLATFORMS); do \
-		$(DOCKER) build -t $(DOCKER_IMAGE):$$i $$i ; \
+		$(MAKE) build PLATFORM=$$i; \
 	done
 
 dist:
