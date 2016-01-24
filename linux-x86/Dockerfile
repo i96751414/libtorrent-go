@@ -1,5 +1,5 @@
-FROM anteo/cross-compiler:linux-x86
-MAINTAINER Anton Argirov "anton.argirov@gmail.com"
+FROM dimitriss/cross-compiler:linux-x86
+MAINTAINER Dimitriss
 
 RUN mkdir -p /build
 WORKDIR /build
@@ -41,7 +41,7 @@ RUN curl -L https://github.com/arvidn/libtorrent/releases/download/libtorrent-`e
     rm -rf `pwd`
 
 # Install Golang
-ENV BOOTSTRAP_GO_VERSION go1.4.2
+ENV BOOTSTRAP_GO_VERSION go1.4.3
 ENV GO_VERSION go1.6beta2
 RUN cd /usr/local && \
     curl -L https://github.com/golang/go/archive/${BOOTSTRAP_GO_VERSION}.tar.gz | tar xvz && \

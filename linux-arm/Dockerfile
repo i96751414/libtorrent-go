@@ -1,5 +1,5 @@
-FROM anteo/cross-compiler:linux-arm
-MAINTAINER Anton Argirov "anton.argirov@gmail.com"
+FROM dimitriss/cross-compiler:linux-arm
+MAINTAINER Dimitriss
 
 RUN mkdir -p /build
 WORKDIR /build
@@ -42,18 +42,12 @@ RUN curl -L https://github.com/arvidn/libtorrent/releases/download/libtorrent-`e
     rm -rf `pwd`
 
 # Install Golang
-ENV BOOTSTRAP_GO_VERSION go1.4.2
-ENV GO_VERSION go1.6beta2
+ENV GO_VERSION 1.4.3
 RUN cd /usr/local && \
-    curl -L https://github.com/golang/go/archive/${BOOTSTRAP_GO_VERSION}.tar.gz | tar xvz && \
-    cd /usr/local/go-${BOOTSTRAP_GO_VERSION}/src && \
+    curl -L http://golang.org/dl/go${GO_VERSION}.src.tar.gz | tar xvz && \
+    cd /usr/local/go/src && \
     CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=linux GOARCH=arm GOARM=6 CGO_ENABLED=1 ./make.bash
-RUN cd /usr/local && \
-    curl -L https://github.com/golang/go/archive/${GO_VERSION}.tar.gz | tar xvz
-RUN cd /usr/local/go-${GO_VERSION}/src && \
-	echo go1.6beta > /usr/local/go-${GO_VERSION}/VERSION && \
-    GOROOT_BOOTSTRAP=/usr/local/go-${BOOTSTRAP_GO_VERSION} CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=linux GOARCH=arm GOARM=6 CGO_ENABLED=1 ./make.bash
-ENV PATH ${PATH}:/usr/local/go-${GO_VERSION}/bin
+ENV PATH ${PATH}:/usr/local/go/bin
 
 # Install SWIG
 ENV SWIG_VERSION 3.0.8
