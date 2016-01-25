@@ -1,7 +1,5 @@
 FROM cross-compiler:darwin-x64
 
-RUN apt-get update && apt-get install -y automake libpcre3-dev bison yodl wget
-
 RUN mkdir -p /build
 WORKDIR /build
 
@@ -25,11 +23,52 @@ RUN curl -L http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | ta
     ${CROSS_TRIPLE}-ranlib ${CROSS_ROOT}/lib/*.a && \
     rm -rf `pwd`
 
+# Install SWIG
+ENV SWIG_VERSION 3.0.8
+RUN apt-get update && apt-get install -y automake libpcre3-dev bison yodl
+RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | tar xvz && \
+    cd swig-rel-${SWIG_VERSION}/ && \
+    ./autogen.sh && \
+    ./configure && make && make install && \
+    rm -rf `pwd`
+
+# Install Golang
+ENV GOLANG_VERSION 1.6beta2
+ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
+ENV GOLANG_SRC_SHA256 8b23d15a3edf1d154ceea5e9ca6370fc60e7f57fb1c28aa8a44c40f8f3167c6d
+
+ENV GOLANG_BOOTSTRAP_VERSION 1.4.3
+ENV GOLANG_BOOTSTRAP_URL https://golang.org/dl/go$GOLANG_BOOTSTRAP_VERSION.src.tar.gz
+ENV GOLANG_BOOTSTRAP_SHA1 486db10dc571a55c8d795365070f66d343458c48
+
+RUN set -ex \
+  && mkdir -p /usr/local/bootstrap \
+	&& wget -q "$GOLANG_BOOTSTRAP_URL" -O golang.tar.gz \
+	&& echo "$GOLANG_BOOTSTRAP_SHA1  golang.tar.gz" | sha1sum -c - \
+	&& tar -C /usr/local/bootstrap -xzf golang.tar.gz \
+	&& rm golang.tar.gz \
+	&& cd /usr/local/bootstrap/go/src \
+	&& ./make.bash \
+	&& export GOROOT_BOOTSTRAP=/usr/local/bootstrap/go \
+	\
+	&& wget -q "$GOLANG_SRC_URL" -O golang.tar.gz \
+	&& echo "$GOLANG_SRC_SHA256  golang.tar.gz" | sha256sum -c - \
+	&& tar -C /usr/local -xzf golang.tar.gz \
+	&& rm golang.tar.gz \
+	&& cd /usr/local/go/src \
+	&& ./make.bash \
+	\
+  && cd /usr/local/go/src/ && CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 ./make.bash --no-clean \
+	&& rm -rf /usr/local/bootstrap /usr/local/go/pkg/bootstrap
+ENV PATH ${PATH}:/usr/local/go/bin
+
 # Install libtorrent
-ENV LIBTORRENT_VERSION 1.0.7
-RUN wget -nc https://github.com/arvidn/libtorrent/releases/download/libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`/libtorrent-rasterbar-${LIBTORRENT_VERSION}.tar.gz && \
-    tar xf libtorrent-rasterbar-${LIBTORRENT_VERSION}.tar.gz && \
-    cd libtorrent-rasterbar-${LIBTORRENT_VERSION}/ && \
+ENV LIBTORRENT_VERSION 1.0.8
+RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`.tar.gz | tar xvz && \
+    apt-get install -y libtool && \
+    cd libtorrent-libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`/ && \
+    ./autotool.sh && \
+    \
     sed -i 's/$PKG_CONFIG openssl --libs-only-/$PKG_CONFIG openssl --static --libs-only-/' ./configure && \
     sed -i -e s/Windows.h/windows.h/ -e s/Wincrypt.h/wincrypt.h/ ./ed25519/src/seed.cpp && \
     \
@@ -48,24 +87,6 @@ RUN wget -nc https://github.com/arvidn/libtorrent/releases/download/libtorrent-`
     make && make install && \
     ${CROSS_TRIPLE}-ranlib ${CROSS_ROOT}/lib/*.a && \
     rm -rf `pwd`
-
-# Install SWIG
-# Need to build from >3.0.2 because Go 1.4.1
-ENV SWIG_VERSION rel-3.0.4
-RUN curl -L https://github.com/swig/swig/archive/${SWIG_VERSION}.tar.gz | tar xvz && \
-    cd swig-${SWIG_VERSION}/ && \
-    curl -L https://github.com/steeve/swig/compare/swig:${SWIG_VERSION}...packed-struct-libtorrent.diff | patch -p1 && \
-    ./autogen.sh && \
-    ./configure && make && make install && \
-    rm -rf `pwd`
-
-# Install Golang
-ENV GO_VERSION 1.4.3
-RUN cd /usr/local && \
-    curl -L http://golang.org/dl/go${GO_VERSION}.src.tar.gz | tar xvz && \
-    cd /usr/local/go/src && \
-    CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 ./make.bash
-ENV PATH ${PATH}:/usr/local/go/bin
 
 WORKDIR /
 RUN rm -rf /build

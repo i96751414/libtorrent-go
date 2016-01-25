@@ -6,12 +6,12 @@ PKG_CONFIG = pkg-config
 DOCKER = docker
 DOCKER_IMAGE = $(NAME)
 PLATFORMS = android-arm \
-			darwin-x64 \
-			linux-x86 \
-			linux-x64 \
-			linux-arm \
-			windows-x86 \
-			windows-x64
+						darwin-x64 \
+						linux-x86 \
+						linux-x64 \
+						linux-arm \
+						windows-x86 \
+						windows-x64
 
 include platform_host.mk
 
@@ -49,8 +49,8 @@ ifneq ($(CROSS_ROOT),)
 	PKG_CONFIG_PATH = $(CROSS_ROOT)/lib/pkgconfig
 endif
 
-LIBTORRENT_CFLAGS = $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --cflags libtorrent-rasterbar)
-LIBTORRENT_LDFLAGS = $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --static --libs libtorrent-rasterbar)
+LIBTORRENT_CFLAGS = $(CFLAGS) $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --cflags libtorrent-rasterbar)
+LIBTORRENT_LDFLAGS = $(LDFLAGS) $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --static --libs libtorrent-rasterbar)
 DEFINE_IGNORES = __STDC__|_cdecl|__cdecl|_fastcall|__fastcall|_stdcall|__stdcall|__declspec
 CC_DEFINES = $(shell echo | $(CC) -dM -E - | grep -v -E "$(DEFINE_IGNORES)" | sed -E "s/\#define[[:space:]]+([a-zA-Z0-9_()]+)[[:space:]]+(.*)/-D\1="\2"/g" | tr '\n' ' ')
 
@@ -61,6 +61,8 @@ ifeq ($(TARGET_OS), windows)
 		CC_DEFINES += -DSWIGWORDSIZE32
 	endif
 else ifeq ($(TARGET_OS), darwin)
+	CC := $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang
+	CXX := $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang++
 	CC_DEFINES += -DSWIGMAC
 	CC_DEFINES += -DBOOST_HAS_PTHREADS
 endif
@@ -68,24 +70,14 @@ endif
 
 OUT_PATH = $(shell go env GOPATH)/pkg/$(GOOS)_$(GOARCH)
 OUT_LIBRARY = $(OUT_PATH)/$(GO_PACKAGE).a
-ifeq ($(TARGET_OS), windows)
-OUT_LIBRARY_SHARED = $(OUT_PATH)/$(GO_PACKAGE).dll
-SONAME = $(shell basename $(OUT_LIBRARY_SHARED))
-endif
 
-all: install
+.PHONY: $(PLATFORMS)
 
-ifeq ($(TARGET_OS), windows)
-install: install_all fix_windows
-else
-install: install_all
-endif
+$(PLATFORMS):
+	$(DOCKER) run --rm -v $(GOPATH):/go -v $(shell pwd):/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):$@ make re;
 
-.PHONY: dockerbuild
-
-install_all:
+build:
 	SWIG_FLAGS='$(CC_DEFINES) $(LIBTORRENT_CFLAGS)' \
-	SONAME=$(SONAME) \
 	CC=$(CC) CXX=$(CXX) \
 	PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) \
 	CGO_ENABLED=1 \
@@ -93,33 +85,21 @@ install_all:
 	PATH=.:$$PATH \
 	go install -v -ldflags '$(GO_LDFLAGS)' -x
 
-fix_windows:
-	mv $(OUT_LIBRARY) $(OUT_LIBRARY).raw
-	cd `mktemp -d` && \
-		pwd && \
-		ar x $(OUT_LIBRARY).raw && \
-		go tool pack r $(OUT_LIBRARY) `ar t $(OUT_LIBRARY).raw | grep -v _wrap` && \
-		$(CXX) -shared -static-libgcc -static-libstdc++ -o $(OUT_LIBRARY_SHARED) *_wrap $(LIBTORRENT_LDFLAGS) && \
-		rm -rf `pwd`
-	rm -rf $(OUT_LIBRARY).raw
-
 clean:
-	rm -rf $(OUT_LIBRARY) $(OUT_LIBRARY_SHARED)
+	rm -rf $(OUT_LIBRARY)
 
-re: clean all
+re: clean build
 
-build:
+env:
 	$(DOCKER) build -t $(DOCKER_IMAGE):$(PLATFORM) $(PLATFORM)
 
-build-envs:
+envs:
 	for i in $(PLATFORMS); do \
-		$(MAKE) build PLATFORM=$$i; \
+		$(MAKE) env PLATFORM=$$i; \
 	done
 
-dist:
-	$(DOCKER) run --rm -v $(GOPATH):/go -e GOPATH=/go -v $(shell pwd):/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) $(DOCKER_IMAGE):$(PLATFORM) make re
-
-alldist:
+all:
+	$(MAKE) envs
 	for i in $(PLATFORMS); do \
-		$(MAKE) dist PLATFORM=$$i; \
+		$(MAKE) $$i; \
 	done

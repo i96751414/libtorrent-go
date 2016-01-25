@@ -14,6 +14,7 @@
 
 #define BOOST_POSIX_API
 #define BOOST_NO_TYPEID
+#define TORRENT_NO_DEPRECATE
 
 namespace std {
     typedef int time_t;
@@ -27,7 +28,16 @@ namespace libtorrent
 {
     typedef int64_t size_type;
     class ptime;
+    class time_duration;
 }
+
+%rename("%(camelcase)s", %$isclass) "";
+%rename("%(camelcase)s", %$isvariable) "";
+%rename("%(camelcase)s", %$isenumitem) "";
+%rename("%(camelcase)s", %$isenum) "";
+%rename("%(camelcase)s", %$istemplate) "";
+%rename("%(camelcase)s", %$isfunction) "";
+%rename("%(camelcase)s", %$isnamespace) "";
 
 // These are problematic, ignore them for now
 %ignore libtorrent::absolutetime_nodeprecate_;
@@ -47,7 +57,6 @@ namespace libtorrent
 %ignore libtorrent::detail::get_file_attributes;
 %ignore libtorrent::log_time;
 %ignore libtorrent::parse_int;
-
 
 %include <boost/preprocessor/cat.hpp>
 %include <boost/version.hpp>
@@ -73,9 +82,10 @@ namespace libtorrent
 %include <libtorrent/address.hpp>
 %include "torrent_info.i"
 %include <libtorrent/session_settings.hpp>
+%include "peer_info.i"
 %include "torrent_handle.i"
 %include <libtorrent/session_status.hpp>
-%include <libtorrent/add_torrent_params.hpp>
+%include "add_torrent_params.i"
 %include "alert.i"
 %include "alert_types.i"
 %include <libtorrent/ptime.hpp>

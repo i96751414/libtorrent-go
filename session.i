@@ -17,7 +17,7 @@ namespace libtorrent
 %ignore libtorrent::session::get_ip_filter;
 %ignore libtorrent::session::dht_put_item;
 
-%template(std_vector_torrent_handle) std::vector<libtorrent::torrent_handle>;
+%template(stdVectorTorrentHandle) std::vector<libtorrent::torrent_handle>;
 
 %extend libtorrent::session {
     libtorrent::alert* pop_alert() {
