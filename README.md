@@ -43,7 +43,7 @@ Download and Build
 + Build libtorrent-go:
 
         cd ~/go/src/github.com/scakemyer/libtorrent-go
-        make [ android-arm | darwin-x64 | linux-x86 | linux-x64 | linux-arm | linux-armv7 | windows-x86 | windows-x64 ]
+        make [ android-arm | darwin-x64 | linux-x86 | linux-x64 | linux-arm | windows-x86 | windows-x64 ]
 
     To build libtorrent bindings for all platforms use `make` or specify needed platform, e.g. `make android-arm`.
     Built packages will be placed under `~/go/pkg/<platform>`
