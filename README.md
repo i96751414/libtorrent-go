@@ -22,28 +22,28 @@ Download and Build
 
 + Create Go home folder and set $GOPATH environment variable:
 
-      mkdir ~/go
-      export GOPATH=~/go
+        mkdir ~/go
+        export GOPATH=~/go
 
 + Download libtorrent-go:
 
-      go get github.com/scakemyer/libtorrent-go
-      cd ~/go/src/github.com/scakemyer/libtorrent-go
+        go get github.com/scakemyer/libtorrent-go
+        cd ~/go/src/github.com/scakemyer/libtorrent-go
 
 + Next, you need to prepare Docker environments. You can do it with two ways:
 
-      make envs
+        make envs
 
     This will download and build all needed development packages and could take hours. But it can be necessary if you want to make your own customizations.
 
     You can also prepare specific environments like so:
 
-      make env PLATFORM=android-arm
+        make env PLATFORM=android-arm
 
 + Build libtorrent-go:
 
-      cd ~/go/src/github.com/scakemyer/libtorrent-go
-      make [ android-arm | darwin-x64 | linux-x86 | linux-x64 | linux-arm | linux-armv7 | windows-x86 | windows-x64 ]
+        cd ~/go/src/github.com/scakemyer/libtorrent-go
+        make [ android-arm | darwin-x64 | linux-x86 | linux-x64 | linux-arm | linux-armv7 | windows-x86 | windows-x64 ]
 
     To build libtorrent bindings for all platforms use `make` or specify needed platform, e.g. `make android-arm`.
     Built packages will be placed under `~/go/pkg/<platform>`
