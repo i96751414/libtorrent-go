@@ -72,7 +72,7 @@ RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBT
     sed -i -e s/Windows.h/windows.h/ -e s/Wincrypt.h/wincrypt.h/ ./ed25519/src/seed.cpp && \
     \
     CC=${CROSS_TRIPLE}-gcc CXX=${CROSS_TRIPLE}-g++ \
-    CFLAGS="${CFLAGS} -O2 -DINT64_MAX=0x7fffffffffffffffLL -DINT16_MAX=32767 -DINT16_MIN=-32768 -DTORRENT_PRODUCTION_ASSERTS" \
+    CFLAGS="${CFLAGS} -O2 -fPIC -DINT64_MAX=0x7fffffffffffffffLL -DINT16_MAX=32767 -DINT16_MIN=-32768 -DTORRENT_PRODUCTION_ASSERTS" \
     CXXFLAGS="${CXXFLAGS} ${CFLAGS}" \
     ./configure \
         --enable-static \
