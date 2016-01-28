@@ -5,13 +5,15 @@ CXX = c++
 PKG_CONFIG = pkg-config
 DOCKER = docker
 DOCKER_IMAGE = $(NAME)
-PLATFORMS = android-arm \
-						darwin-x64 \
-						linux-x86 \
-						linux-x64 \
-						linux-arm \
-						windows-x86 \
-						windows-x64
+PLATFORMS = \
+	android-arm \
+	android-x64 \
+	darwin-x64 \
+	linux-x86 \
+	linux-x64 \
+	linux-arm \
+	windows-x86 \
+	windows-x64
 
 include platform_host.mk
 
@@ -22,11 +24,11 @@ endif
 
 include platform_target.mk
 
-ifeq ($(TARGET_ARCH),x86)
+ifeq ($(TARGET_ARCH), x86)
 	GOARCH = 386
-else ifeq ($(TARGET_ARCH),x64)
+else ifeq ($(TARGET_ARCH), x64)
 	GOARCH = amd64
-else ifeq ($(TARGET_ARCH),arm)
+else ifeq ($(TARGET_ARCH), arm)
 	GOARCH = arm
 	GOARM = 6
 endif
@@ -39,7 +41,11 @@ else ifeq ($(TARGET_OS), linux)
 	GOOS = linux
 else ifeq ($(TARGET_OS), android)
 	GOOS = android
-	GOARM = 7
+	ifeq ($(TARGET_ARCH), arm)
+		GOARM = 7
+	else
+		GOARM =
+	endif
 	GO_LDFLAGS = -extldflags=-pie
 endif
 
