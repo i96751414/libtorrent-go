@@ -109,8 +109,14 @@ envs:
 		$(MAKE) env PLATFORM=$$i; \
 	done
 
+pull:
+	for i in $(PLATFORMS); do \
+		docker pull quasarhq/cross-compiler:$$i; \
+		docker tag quasarhq/cross-compiler:$$i cross-compiler:$$i; \
+	done
+
 push:
 	for i in $(PLATFORMS); do \
-	  docker tag cross-compiler:$$i quasarhq/libtorrent-go:$$i; \
+	  docker tag libtorrent-go:$$i quasarhq/libtorrent-go:$$i; \
 	  docker push quasarhq/libtorrent-go:$$i; \
 	done
