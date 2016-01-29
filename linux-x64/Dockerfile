@@ -49,7 +49,7 @@ RUN set -ex \
 	&& tar -C /usr/local/bootstrap -xzf golang.tar.gz \
 	&& rm golang.tar.gz \
 	&& cd /usr/local/bootstrap/go/src \
-	&& ./make.bash 1>log 2>err \
+	&& ./make.bash 1>golang.log 2>golang.err \
 	&& export GOROOT_BOOTSTRAP=/usr/local/bootstrap/go \
 	\
 	&& wget -q "$GOLANG_SRC_URL" -O golang.tar.gz \
@@ -57,7 +57,7 @@ RUN set -ex \
 	&& tar -C /usr/local -xzf golang.tar.gz \
 	&& rm golang.tar.gz \
 	&& cd /usr/local/go/src \
-	&& ./make.bash 1>log 2>err \
+	&& ./make.bash 1>golang.log 2>golang.err \
 	\
 	&& rm -rf /usr/local/bootstrap /usr/local/go/pkg/bootstrap \
   && export GOROOT_BOOTSTRAP=/usr/local/go && cd /usr/local/go/src/ && CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=linux GOARCH=amd64 CGO_ENABLED=1 ./make.bash --no-clean
