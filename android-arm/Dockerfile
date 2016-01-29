@@ -9,7 +9,7 @@ RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/b
     cd boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`/ && \
     ./bootstrap.sh --prefix=${CROSS_ROOT} && \
     echo "using gcc : android : ${CROSS_TRIPLE}-c++ ;" > ${HOME}/user-config.jam && \
-    ./b2 --with-date_time --with-system --prefix=${CROSS_ROOT} toolset=gcc-android link=static variant=release threading=multi target-os=linux install && \
+    ./b2 --with-date_time --with-system --prefix=${CROSS_ROOT} toolset=gcc-android link=static variant=release threading=multi target-os=linux install 1>log 2>err && \
     rm -rf ${HOME}/user-config.jam && \
     rm -rf `pwd`
 
