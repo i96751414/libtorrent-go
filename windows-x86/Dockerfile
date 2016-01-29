@@ -5,7 +5,7 @@ WORKDIR /build
 
 # Install Boost.System
 ENV BOOST_VERSION 1.60.0
-RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`.tar.bz2/download | tar xvj && \
+RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`.tar.bz2/download | tar xj && \
     cd boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`/ && \
     ./bootstrap.sh --prefix=${CROSS_ROOT} && \
     echo "using gcc : mingw32 : ${CROSS_TRIPLE}-c++ ;" > ${HOME}/user-config.jam && \
@@ -15,7 +15,7 @@ RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/b
 
 # Install OpenSSL
 ENV OPENSSL_VERSION 1.0.2e
-RUN curl -L http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xvz && \
+RUN curl -L http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xz && \
     cd openssl-${OPENSSL_VERSION}/ && \
     CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared mingw --prefix=${CROSS_ROOT} && \
     make && make install && \
@@ -27,7 +27,7 @@ RUN curl -L http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | ta
 # Install SWIG
 ENV SWIG_VERSION 3.0.8
 RUN apt-get update && apt-get install -y automake libpcre3-dev bison yodl
-RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | tar xvz
+RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | tar xz
 RUN cd swig-rel-${SWIG_VERSION}/ && \
     ./autogen.sh && \
     ./configure && make && make install && \
@@ -67,7 +67,7 @@ ENV PATH ${PATH}:/usr/local/go/bin
 # Changes:
 # - define WIN32, _UNICODE, IPV6_TCLASS=39
 ENV LIBTORRENT_VERSION 1.0.8
-RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`.tar.gz | tar xvz && \
+RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`.tar.gz | tar xz && \
     apt-get install -y libtool && \
     cd libtorrent-libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`/ && \
     ./autotool.sh && \

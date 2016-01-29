@@ -79,6 +79,11 @@ OUT_LIBRARY = $(OUT_PATH)/$(GO_PACKAGE).a
 
 .PHONY: $(PLATFORMS)
 
+all:
+	for i in $(PLATFORMS); do \
+		$(MAKE) $$i; \
+	done
+
 $(PLATFORMS):
 	$(DOCKER) run --rm -v $(GOPATH):/go -v $(shell pwd):/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):$@ make re;
 
@@ -104,8 +109,8 @@ envs:
 		$(MAKE) env PLATFORM=$$i; \
 	done
 
-all:
-	$(MAKE) envs
+push:
 	for i in $(PLATFORMS); do \
-		$(MAKE) $$i; \
+	  docker tag cross-compiler:$$i quasarhq/libtorrent-go:$$i; \
+	  docker push quasarhq/libtorrent-go:$$i; \
 	done
