@@ -110,13 +110,9 @@ envs:
 	done
 
 pull:
-	for i in $(PLATFORMS); do \
-		docker pull quasarhq/cross-compiler:$$i; \
-		docker tag quasarhq/cross-compiler:$$i cross-compiler:$$i; \
-	done
+	docker pull quasarhq/cross-compiler:$(PLATFORM)
+	docker tag quasarhq/cross-compiler:$(PLATFORM) cross-compiler:$(PLATFORM)
 
 push:
-	for i in $(PLATFORMS); do \
-	  docker tag libtorrent-go:$$i quasarhq/libtorrent-go:$$i; \
-	  docker push quasarhq/libtorrent-go:$$i; \
-	done
+	docker tag libtorrent-go:$(PLATFORM) quasarhq/libtorrent-go:$(PLATFORM)
+	docker push quasarhq/libtorrent-go:$(PLATFORM)

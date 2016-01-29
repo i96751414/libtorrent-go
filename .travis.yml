@@ -3,6 +3,16 @@ language: go
 go:
   - 1.5.3
 
+env:
+  - PLATFORM=android-arm
+  - PLATFORM=android-x64
+  - PLATFORM=darwin-x64
+  - PLATFORM=linux-x86
+  - PLATFORM=linux-x64
+  - PLATFORM=linux-arm
+  - PLATFORM=windows-x86
+  - PLATFORM=windows-x64
+
 services:
   - docker
 
@@ -10,17 +20,10 @@ before_install:
   - make pull
 
 install:
-  - make env PLATFORM=android-arm
-  - make env PLATFORM=android-x64
-  - make env PLATFORM=darwin-x64
-  - make env PLATFORM=linux-x86
-  - make env PLATFORM=linux-x64
-  - make env PLATFORM=linux-arm
-  - make env PLATFORM=windows-x86
-  - make env PLATFORM=windows-x64
+  - make env
 
 script:
-  - make
+  - make $PLATFORM
 
 after_script:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
