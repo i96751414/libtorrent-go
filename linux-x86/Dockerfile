@@ -17,8 +17,9 @@ RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/b
 ENV OPENSSL_VERSION 1.0.2f
 RUN curl -L https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xz && \
     cd openssl-${OPENSSL_VERSION}/ && \
-    CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared linux-elf --prefix=${CROSS_ROOT} && \
-    make && make install && \
+    CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared linux-elf --prefix=${CROSS_ROOT} 1>log 2>err && \
+    make 1>log 2>err && \
+    make install 1>log 2>err && \
     rm -rf `pwd`
 
 # Install SWIG
@@ -27,7 +28,9 @@ RUN apt-get update && apt-get install -y automake libpcre3-dev bison yodl
 RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | tar xz && \
     cd swig-rel-${SWIG_VERSION}/ && \
     ./autogen.sh && \
-    ./configure && make && make install && \
+    ./configure && \
+    make 1>log 2>err && \
+    make install 1>log 2>err && \
     rm -rf `pwd`
 
 # Install Golang
@@ -46,7 +49,7 @@ RUN set -ex \
 	&& tar -C /usr/local/bootstrap -xzf golang.tar.gz \
 	&& rm golang.tar.gz \
 	&& cd /usr/local/bootstrap/go/src \
-	&& ./make.bash \
+	&& ./make.bash 1>log 2>err \
 	&& export GOROOT_BOOTSTRAP=/usr/local/bootstrap/go \
 	\
 	&& wget -q "$GOLANG_SRC_URL" -O golang.tar.gz \
@@ -54,7 +57,7 @@ RUN set -ex \
 	&& tar -C /usr/local -xzf golang.tar.gz \
 	&& rm golang.tar.gz \
 	&& cd /usr/local/go/src \
-	&& ./make.bash \
+	&& ./make.bash 1>log 2>err \
 	\
 	&& rm -rf /usr/local/bootstrap /usr/local/go/pkg/bootstrap \
   && export GOROOT_BOOTSTRAP=/usr/local/go && cd /usr/local/go/src/ && CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=linux GOARCH=386 CGO_ENABLED=1 ./make.bash --no-clean
