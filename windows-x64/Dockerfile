@@ -14,8 +14,8 @@ RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/b
     rm -rf `pwd`
 
 # Install OpenSSL
-ENV OPENSSL_VERSION 1.0.2e
-RUN curl -L http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xz && \
+ENV OPENSSL_VERSION 1.0.2f
+RUN curl -L https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xz && \
     cd openssl-${OPENSSL_VERSION}/ && \
     CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared mingw64 --prefix=${CROSS_ROOT} && \
     make && make install && \
