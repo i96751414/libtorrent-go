@@ -35,7 +35,7 @@ RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | ta
 # Install Golang
 ENV GOLANG_VERSION 1.6rc1
 ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
-ENV GOLANG_SRC_SHA256 754e06dab1c31ab168fc9db9e32596734015ea9e24bc44cae7f237f417ce4efe
+ENV GOLANG_SRC_SHA256 2d1a6756f24227dcee955add4af7d194eb4a8c3656b2c4ce778994e21a533a83
 
 ENV GOLANG_BOOTSTRAP_VERSION 1.4.3
 ENV GOLANG_BOOTSTRAP_URL https://golang.org/dl/go$GOLANG_BOOTSTRAP_VERSION.src.tar.gz
