@@ -24,5 +24,8 @@ install:
 
 script:
   - make $PLATFORM
-  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && make push || true'
+  - |
+    if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then
+      docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      make push
+    fi
