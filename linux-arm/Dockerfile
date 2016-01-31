@@ -58,7 +58,7 @@ RUN set -ex \
   && cd /usr/local/go/src \
   && ./make.bash 1>golang.log 2>golang.err \
   \
-  && cd /usr/local/go/src/ && CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=linux GOARCH=arm GOARM=6 CGO_ENABLED=1 ./make.bash --no-clean \
+  && CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=linux GOARCH=arm GOARM=6 CGO_ENABLED=1 ./make.bash --no-clean \
   && rm -rf /usr/local/bootstrap /usr/local/go/pkg/bootstrap
 ENV PATH ${PATH}:/usr/local/go/bin
 
