@@ -8,12 +8,13 @@ DOCKER_IMAGE = $(NAME)
 PLATFORMS = \
 	android-arm \
 	android-x64 \
+	android-x86 \
 	darwin-x64 \
-	linux-x86 \
-	linux-x64 \
 	linux-arm \
-	windows-x86 \
-	windows-x64
+	linux-x64 \
+	linux-x86 \
+	windows-x64 \
+	windows-x86
 
 include platform_host.mk
 
