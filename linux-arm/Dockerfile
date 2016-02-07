@@ -78,6 +78,7 @@ RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBT
     CXXFLAGS="${CXXFLAGS} ${CFLAGS}" \
     ./configure \
         --enable-static \
+        --disable-geoip \
         --disable-shared \
         --disable-deprecated-functions \
         --host=${CROSS_TRIPLE} \
