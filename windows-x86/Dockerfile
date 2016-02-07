@@ -36,7 +36,7 @@ RUN cd swig-rel-${SWIG_VERSION}/ && \
     rm -rf `pwd`
 
 # Install Golang
-ENV GOLANG_VERSION 1.6rc1
+ENV GOLANG_VERSION 1.6rc2
 ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
 ENV GOLANG_SRC_SHA256 2d1a6756f24227dcee955add4af7d194eb4a8c3656b2c4ce778994e21a533a83
 
