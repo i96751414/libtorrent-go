@@ -14,7 +14,7 @@ RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/b
     rm -rf `pwd`
 
 # Install OpenSSL
-ENV OPENSSL_VERSION 1.0.2f
+ENV OPENSSL_VERSION 1.0.2g
 RUN curl -L https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xz && \
     cd openssl-${OPENSSL_VERSION}/ && \
     CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared android-x86 --prefix=${CROSS_ROOT} 1>log 2>err && \
@@ -63,7 +63,7 @@ RUN set -ex \
 ENV PATH ${PATH}:/usr/local/go/bin
 
 # Install libtorrent
-ENV LIBTORRENT_VERSION 1.0.8
+ENV LIBTORRENT_VERSION 1.0.9
 RUN echo "#define BOOST_SP_USE_PTHREADS" >> ${CROSS_ROOT}/include/boost/config/user.hpp
 RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`.tar.gz | tar xz && \
     apt-get install -y libtool && \

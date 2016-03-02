@@ -1,4 +1,4 @@
-FROM cross-compiler:darwin-x64
+FROM cross-compiler:linux-armv7
 
 RUN mkdir -p /build
 WORKDIR /build
@@ -8,9 +8,8 @@ ENV BOOST_VERSION 1.60.0
 RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`.tar.bz2/download | tar xj && \
     cd boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`/ && \
     ./bootstrap.sh --prefix=${CROSS_ROOT} && \
-    echo "using clang : darwin : ${CROSS_TRIPLE}-c++ ;" > ${HOME}/user-config.jam && \
-    ./b2 --with-date_time --with-system --prefix=${CROSS_ROOT} toolset=clang-darwin link=static variant=release threading=multi target-os=darwin install 1>log 2>err && \
-    ${CROSS_TRIPLE}-ranlib ${CROSS_ROOT}/lib/*.a && \
+    echo "using gcc : linux : ${CROSS_TRIPLE}-c++ ;" > ${HOME}/user-config.jam && \
+    ./b2 --with-date_time --with-system --prefix=${CROSS_ROOT} cxxflags=-fPIC toolset=gcc-linux link=static variant=release threading=multi target-os=linux install 1>log 2>err && \
     rm -rf ${HOME}/user-config.jam && \
     rm -rf `pwd`
 
@@ -18,10 +17,9 @@ RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/b
 ENV OPENSSL_VERSION 1.0.2g
 RUN curl -L https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xz && \
     cd openssl-${OPENSSL_VERSION}/ && \
-    CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared darwin64-x86_64-cc --prefix=${CROSS_ROOT} 1>log 2>err && \
+    CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared linux-armv4 -fPIC --prefix=${CROSS_ROOT} 1>log 2>err && \
     make 1>log 2>err && \
     make install 1>log 2>err && \
-    ${CROSS_TRIPLE}-ranlib ${CROSS_ROOT}/lib/*.a && \
     rm -rf `pwd`
 
 # Install SWIG
@@ -29,7 +27,7 @@ ENV SWIG_VERSION 3.0.8
 RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | tar xz && \
     cd swig-rel-${SWIG_VERSION}/ && \
     ./autogen.sh && \
-    ./configure 1>log 2>err && \
+    ./configure && \
     make 1>log 2>err && \
     make install 1>log 2>err && \
     rm -rf `pwd`
@@ -60,12 +58,13 @@ RUN set -ex \
   && cd /usr/local/go/src \
   && ./make.bash 1>golang.log 2>golang.err \
   \
-  && CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 ./make.bash --no-clean \
+  && CC_FOR_TARGET=${CROSS_TRIPLE}-cc CXX_FOR_TARGET=${CROSS_TRIPLE}-c++ GOOS=linux GOARCH=arm GOARM=7 CGO_ENABLED=1 ./make.bash --no-clean \
   && rm -rf /usr/local/bootstrap /usr/local/go/pkg/bootstrap
 ENV PATH ${PATH}:/usr/local/go/bin
 
 # Install libtorrent
 ENV LIBTORRENT_VERSION 1.0.9
+RUN echo "#define BOOST_SP_USE_PTHREADS" >> ${CROSS_ROOT}/include/boost/config/user.hpp
 RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`.tar.gz | tar xz && \
     apt-get install -y libtool && \
     cd libtorrent-libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`/ && \
@@ -74,10 +73,9 @@ RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBT
     sed -i 's/$PKG_CONFIG openssl --libs-only-/$PKG_CONFIG openssl --static --libs-only-/' ./configure && \
     sed -i -e s/Windows.h/windows.h/ -e s/Wincrypt.h/wincrypt.h/ ./ed25519/src/seed.cpp && \
     \
-    OSXCROSS_PKG_CONFIG_PATH=${CROSS_ROOT}/lib/pkgconfig/ \
-    CC=${CROSS_TRIPLE}-cc CXX=${CROSS_TRIPLE}-c++ \
-    CFLAGS="${CFLAGS} -O2" \
-    CXXFLAGS="${CXXFLAGS} ${CFLAGS} -O2" \
+    CC=${CROSS_TRIPLE}-gcc CXX=${CROSS_TRIPLE}-g++ \
+    CFLAGS="${CFLAGS} -O2 -fPIC" \
+    CXXFLAGS="${CXXFLAGS} ${CFLAGS}" \
     ./configure \
         --enable-static \
         --disable-geoip \
@@ -88,7 +86,6 @@ RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBT
         --with-boost=${CROSS_ROOT} --with-boost-libdir=${CROSS_ROOT}/lib && \
     \
     make && make install && \
-    ${CROSS_TRIPLE}-ranlib ${CROSS_ROOT}/lib/*.a && \
     rm -rf `pwd`
 
 WORKDIR /

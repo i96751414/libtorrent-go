@@ -8,9 +8,11 @@ env:
   - PLATFORM=android-x64
   - PLATFORM=android-x86
   - PLATFORM=darwin-x64
+  - PLATFORM=linux-arm
+  - PLATFORM=linux-armv7
+  - PLATFORM=linux-arm64
   - PLATFORM=linux-x64
   - PLATFORM=linux-x86
-  - PLATFORM=linux-arm
   - PLATFORM=windows-x64
   - PLATFORM=windows-x86
 

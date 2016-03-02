@@ -1,3 +1,4 @@
+PROJECT = quasarhq
 NAME = libtorrent-go
 GO_PACKAGE = github.com/scakemyer/$(NAME)
 CC = cc
@@ -11,6 +12,8 @@ PLATFORMS = \
 	android-x86 \
 	darwin-x64 \
 	linux-arm \
+	linux-armv7 \
+	linux-arm64 \
 	linux-x64 \
 	linux-x86 \
 	windows-x64 \
@@ -32,6 +35,14 @@ else ifeq ($(TARGET_ARCH), x64)
 else ifeq ($(TARGET_ARCH), arm)
 	GOARCH = arm
 	GOARM = 6
+else ifeq ($(TARGET_ARCH), armv7)
+	GOARCH = arm
+	GOARM = 7
+	PATH_SUFFIX = v7
+	PKGDIR = -pkgdir /go/pkg/linux_armv7
+else ifeq ($(TARGET_ARCH), arm64)
+	GOARCH = arm64
+	GOARM =
 endif
 
 ifeq ($(TARGET_OS), windows)
@@ -75,7 +86,7 @@ else ifeq ($(TARGET_OS), darwin)
 endif
 
 
-OUT_PATH = $(shell go env GOPATH)/pkg/$(GOOS)_$(GOARCH)
+OUT_PATH = $(shell go env GOPATH)/pkg/$(GOOS)_$(GOARCH)$(PATH_SUFFIX)
 OUT_LIBRARY = $(OUT_PATH)/$(GO_PACKAGE).a
 
 .PHONY: $(PLATFORMS)
@@ -99,7 +110,7 @@ build:
 	CGO_ENABLED=1 \
 	GOOS=$(GOOS) GOARCH=$(GOARCH) GOARM=$(GOARM) \
 	PATH=.:$$PATH \
-	go install -v -ldflags '$(GO_LDFLAGS)' -x
+	go install -v -ldflags '$(GO_LDFLAGS)' -x $(PKGDIR)
 
 clean:
 	rm -rf $(OUT_LIBRARY)
@@ -115,9 +126,9 @@ envs:
 	done
 
 pull:
-	docker pull quasarhq/cross-compiler:$(PLATFORM)
-	docker tag quasarhq/cross-compiler:$(PLATFORM) cross-compiler:$(PLATFORM)
+	docker pull $(PROJECT)/cross-compiler:$(PLATFORM)
+	docker tag $(PROJECT)/cross-compiler:$(PLATFORM) cross-compiler:$(PLATFORM)
 
 push:
-	docker tag libtorrent-go:$(PLATFORM) quasarhq/libtorrent-go:$(PLATFORM)
-	docker push quasarhq/libtorrent-go:$(PLATFORM)
+	docker tag libtorrent-go:$(PLATFORM) $(PROJECT)/libtorrent-go:$(PLATFORM)
+	docker push $(PROJECT)/libtorrent-go:$(PLATFORM)
