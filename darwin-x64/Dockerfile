@@ -25,7 +25,7 @@ RUN curl -L https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | t
     rm -rf `pwd`
 
 # Install SWIG
-ENV SWIG_VERSION 3.0.9
+ENV SWIG_VERSION 3.0.10
 RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | tar xz && \
     cd swig-rel-${SWIG_VERSION}/ && \
     ./autogen.sh && \
