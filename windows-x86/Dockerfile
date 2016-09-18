@@ -4,7 +4,7 @@ RUN mkdir -p /build
 WORKDIR /build
 
 # Install Boost.System
-ENV BOOST_VERSION 1.60.0
+ENV BOOST_VERSION 1.61.0
 RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`.tar.bz2/download | tar xj && \
     cd boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`/ && \
     ./bootstrap.sh --prefix=${CROSS_ROOT} && \
@@ -26,7 +26,7 @@ RUN curl -L https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | t
 # RUN ${CROSS_TRIPLE}-ranlib ${CROSS_ROOT}/lib/*.a
 
 # Install SWIG
-ENV SWIG_VERSION 3.0.8
+ENV SWIG_VERSION 3.0.9
 RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | tar xz
 RUN cd swig-rel-${SWIG_VERSION}/ && \
     ./autogen.sh && \
@@ -36,9 +36,9 @@ RUN cd swig-rel-${SWIG_VERSION}/ && \
     rm -rf `pwd`
 
 # Install Golang
-ENV GOLANG_VERSION 1.6.2
+ENV GOLANG_VERSION 1.7.1
 ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
-ENV GOLANG_SRC_SHA256 787b0b750d037016a30c6ed05a8a70a91b2e9db4bd9b1a2453aa502a63f1bccc
+ENV GOLANG_SRC_SHA256 2b843f133b81b7995f26d0cb64bbdbb9d0704b90c44df45f844d28881ad442d3
 
 ENV GOLANG_BOOTSTRAP_VERSION 1.4.3
 ENV GOLANG_BOOTSTRAP_URL https://golang.org/dl/go$GOLANG_BOOTSTRAP_VERSION.src.tar.gz
@@ -68,7 +68,7 @@ ENV PATH ${PATH}:/usr/local/go/bin
 # Install libtorrent
 # Changes:
 # - define WIN32, _UNICODE, IPV6_TCLASS=39
-ENV LIBTORRENT_VERSION 1.0.9
+ENV LIBTORRENT_VERSION 1.0.10
 RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`.tar.gz | tar xz && \
     cd libtorrent-libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`/ && \
     ./autotool.sh && \
