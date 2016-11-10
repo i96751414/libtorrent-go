@@ -14,7 +14,7 @@ RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/b
     rm -rf `pwd`
 
 # Install OpenSSL
-ENV OPENSSL_VERSION 1.0.2h
+ENV OPENSSL_VERSION 1.0.2j
 RUN curl -L https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xz && \
     cd openssl-${OPENSSL_VERSION}/ && \
     CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared mingw --prefix=${CROSS_ROOT} 1>log 2>err && \
@@ -36,9 +36,9 @@ RUN cd swig-rel-${SWIG_VERSION}/ && \
     rm -rf `pwd`
 
 # Install Golang
-ENV GOLANG_VERSION 1.7.1
+ENV GOLANG_VERSION 1.7.3
 ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
-ENV GOLANG_SRC_SHA256 2b843f133b81b7995f26d0cb64bbdbb9d0704b90c44df45f844d28881ad442d3
+ENV GOLANG_SRC_SHA256 79430a0027a09b0b3ad57e214c4c1acfdd7af290961dd08d322818895af1ef44
 
 ENV GOLANG_BOOTSTRAP_VERSION 1.4.3
 ENV GOLANG_BOOTSTRAP_URL https://golang.org/dl/go$GOLANG_BOOTSTRAP_VERSION.src.tar.gz
