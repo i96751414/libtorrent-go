@@ -4,7 +4,7 @@ RUN mkdir -p /build
 WORKDIR /build
 
 # Install Boost.System
-ENV BOOST_VERSION 1.63.0
+ENV BOOST_VERSION 1.62.0
 RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`.tar.bz2/download | tar xj && \
     cd boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`/ && \
     ./bootstrap.sh --prefix=${CROSS_ROOT} && \
