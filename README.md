@@ -30,6 +30,10 @@ Download and Build
         go get github.com/scakemyer/libtorrent-go
         cd ~/go/src/github.com/scakemyer/libtorrent-go
 
+* Pull the cross-compiler image for your platform:
+
+        make pull PLATFORM=android-arm
+
 + Next, you need to prepare Docker environments. You can do it with two ways:
 
         make envs
@@ -42,8 +46,9 @@ Download and Build
 
 + Build libtorrent-go:
 
-        cd ~/go/src/github.com/scakemyer/libtorrent-go
-        make [ android-arm | darwin-x64 | linux-x86 | linux-x64 | linux-arm | windows-x86 | windows-x64 ]
+        make [ android-arm | android-x86 | android-x64 |
+               linux-x86   | linux-x64   | linux-arm   | linux-armv7 | linux-arm64 |
+               windows-x86 | windows-x64 | darwin-x64  ]
 
     To build libtorrent bindings for all platforms use `make` or specify needed platform, e.g. `make android-arm`.
     Built packages will be placed under `~/go/pkg/<platform>`

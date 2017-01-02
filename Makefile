@@ -74,7 +74,7 @@ CC_DEFINES = $(shell echo | $(CC) -dM -E - | grep -v -E "$(DEFINE_IGNORES)" | se
 
 ifeq ($(TARGET_OS), windows)
 	CC_DEFINES += -DSWIGWIN
-	CC_DEFINES += -D_WIN32_WINNT=0x0501
+	CC_DEFINES += -D_WIN32_WINNT=0x0600
 	ifeq ($(TARGET_ARCH), x64)
 		CC_DEFINES += -DSWIGWORDSIZE32
 	endif

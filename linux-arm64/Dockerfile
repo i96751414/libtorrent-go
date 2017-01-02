@@ -4,12 +4,12 @@ RUN mkdir -p /build
 WORKDIR /build
 
 # Install Boost.System
-ENV BOOST_VERSION 1.62.0
-RUN curl -L http://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`.tar.bz2/download | tar xj && \
+ENV BOOST_VERSION 1.63.0
+RUN curl -L https://sourceforge.net/projects/boost/files/boost/${BOOST_VERSION}/boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`.tar.bz2/download | tar xj && \
     cd boost_`echo ${BOOST_VERSION} | sed 's/\\./_/g'`/ && \
     ./bootstrap.sh --prefix=${CROSS_ROOT} && \
     echo "using gcc : linux : ${CROSS_TRIPLE}-c++ ;" > ${HOME}/user-config.jam && \
-    ./b2 --with-date_time --with-system --prefix=${CROSS_ROOT} cxxflags=-fPIC toolset=gcc-linux link=static variant=release threading=multi target-os=linux install 1>log 2>err && \
+    ./b2 --with-date_time --with-system --with-chrono --with-random --prefix=${CROSS_ROOT} cxxflags=-fPIC cflags=-fPIC toolset=gcc-linux link=static variant=release threading=multi target-os=linux install 1>log 2>err && \
     rm -rf ${HOME}/user-config.jam && \
     rm -rf `pwd`
 
@@ -18,17 +18,17 @@ ENV OPENSSL_VERSION 1.0.2j
 RUN curl -L https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xz && \
     cd openssl-${OPENSSL_VERSION}/ && \
     CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared linux-aarch64 -fPIC --prefix=${CROSS_ROOT} && \
-    make && \
+    make -j $(cat /proc/cpuinfo | grep processor | wc -l) 1>log 2>err && \
     make install && \
     rm -rf `pwd`
 
 # Install SWIG
-ENV SWIG_VERSION 3.0.10
+ENV SWIG_VERSION 3.0.11
 RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | tar xz && \
     cd swig-rel-${SWIG_VERSION}/ && \
     ./autogen.sh && \
     ./configure && \
-    make 1>log 2>err && \
+    make -j $(cat /proc/cpuinfo | grep processor | wc -l) 1>log 2>err && \
     make install 1>log 2>err && \
     rm -rf `pwd`
 
@@ -63,7 +63,7 @@ RUN set -ex \
 ENV PATH ${PATH}:/usr/local/go/bin
 
 # Install libtorrent
-ENV LIBTORRENT_VERSION 1.0.10
+ENV LIBTORRENT_VERSION 1.1.1
 RUN echo "#define BOOST_SP_USE_PTHREADS" >> ${CROSS_ROOT}/include/boost/config/user.hpp
 RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`.tar.gz | tar xz && \
     cd libtorrent-libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`/ && \
@@ -77,14 +77,13 @@ RUN curl -L https://github.com/arvidn/libtorrent/archive/libtorrent-`echo ${LIBT
     CXXFLAGS="${CXXFLAGS} ${CFLAGS}" \
     ./configure \
         --enable-static \
-        --disable-geoip \
         --disable-shared \
         --disable-deprecated-functions \
         --host=${CROSS_TRIPLE} \
         --prefix=${CROSS_ROOT} \
         --with-boost=${CROSS_ROOT} --with-boost-libdir=${CROSS_ROOT}/lib && \
     \
-    make && make install && \
+    make -j $(cat /proc/cpuinfo | grep processor | wc -l) && make install && \
     rm -rf `pwd`
 
 WORKDIR /

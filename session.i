@@ -1,30 +1,46 @@
 %{
+#include <libtorrent/io_service.hpp>
+#include <libtorrent/ip_filter.hpp>
+#include <libtorrent/kademlia/dht_storage.hpp>
+#include <libtorrent/bandwidth_limit.hpp>
+#include <libtorrent/peer_class.hpp>
+#include <libtorrent/peer_class_type_filter.hpp>
+#include <libtorrent/settings_pack.hpp>
 #include <libtorrent/session.hpp>
+#include <libtorrent/session_stats.hpp>
+#include <libtorrent/session_status.hpp>
+#include <libtorrent/session_handle.hpp>
 %}
 
-%include <std_vector.i>
-
-namespace libtorrent
-{
-    class io_service;
-    class cache_status;
-    class cached_piece_info;
-    class feed_settings;
-    class feed_handle;
-}
-
 // These are problematic, so we ignore them.
-%ignore libtorrent::session::get_ip_filter;
-%ignore libtorrent::session::dht_put_item;
+%ignore libtorrent::session_handle::add_extension;
+%ignore libtorrent::session_handle::dht_put_item;
 
-%template(stdVectorTorrentHandle) std::vector<libtorrent::torrent_handle>;
+%template(stdVectorAlerts) std::vector<libtorrent::alert*>;
 
 %extend libtorrent::session {
-    libtorrent::alert* pop_alert() {
-        return self->pop_alert().release();
-    }
+  libtorrent::session_handle* get_handle() {
+    return self;
+  }
 }
-%ignore libtorrent::session::pop_alert;
+%extend libtorrent::session_handle {
+  std::vector<libtorrent::alert*> pop_alerts() {
+    std::vector<libtorrent::alert*> alerts;
+    self->pop_alerts(&alerts);
+    return alerts;
+  }
+}
+%ignore libtorrent::session_handle::pop_alerts;
 
 %include "extensions.i"
+%include <libtorrent/io_service.hpp>
+%include <libtorrent/ip_filter.hpp>
+%include <libtorrent/kademlia/dht_storage.hpp>
+%include <libtorrent/bandwidth_limit.hpp>
+%include <libtorrent/peer_class.hpp>
+%include <libtorrent/peer_class_type_filter.hpp>
+%include <libtorrent/settings_pack.hpp>
 %include <libtorrent/session.hpp>
+%include <libtorrent/session_stats.hpp>
+%include <libtorrent/session_status.hpp>
+%include <libtorrent/session_handle.hpp>

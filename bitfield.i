@@ -4,7 +4,7 @@
 
 %extend libtorrent::bitfield {
     void const* bytes() const {
-        return (void*)self->bytes();
+        return (void*)self->data();
     }
 }
 %ignore libtorrent::bitfield::bytes;

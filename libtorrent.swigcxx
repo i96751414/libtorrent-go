@@ -1,16 +1,29 @@
 %module libtorrent
 
+#pragma SWIG nowarn=204 // CPP #warning, ""unknown OS, assuming BSD"", ""unknown platform, assuming the longest path is 255"".
+// Identifier 'GetCArray' redefined (ignored) (Renamed from 'get_c_array'), previous definition of 'GetCArray' (Renamed from 'get_c_array').
+#pragma SWIG nowarn=302
+#pragma SWIG nowarn=312 // Nested union not currently supported (ignored).
+#pragma SWIG nowarn=314 // 'range' is a Go keyword, renaming to 'Xrange'
+#pragma SWIG nowarn=315 // Nothing known about 'boost::asio::ip::tcp'.
+#pragma SWIG nowarn=317 // Specialization of non-template '<name>'.
+#pragma SWIG nowarn=319 // No access specifier given for base class 'boost::noncopyable' (ignored).
+#pragma SWIG nowarn=325 // Nested struct not currently supported (const_iterator ignored)
+#pragma SWIG nowarn=341 // The 'using' keyword in type aliasing is not fully supported yet.
+#pragma SWIG nowarn=401 // Nothing known about base class '<name>'. Ignored.
+#pragma SWIG nowarn=402 // Base class '<name>' is incomplete.
+#pragma SWIG nowarn=503 // Can't wrap 'Operator ...' unless renamed to a valid identifier.
+#pragma SWIG nowarn=516 // Overloaded method ... ignored, using ... instead.
+#pragma SWIG nowarn=890 // Ignoring '...' due to Go name ('...') conflict with '...'
+
 %{
-#include <libtorrent/session.hpp>
+#include <boost/chrono.hpp>
+#include <libtorrent/time.hpp>
 %}
 
 %include <stl.i>
 %include <stdint.i>
 %include <typemaps.i>
-
-#ifdef SWIGWIN
-    %include <windows.i>
-#endif
 
 #define BOOST_POSIX_API
 #define BOOST_NO_TYPEID
@@ -18,6 +31,12 @@
 
 namespace std {
     typedef int time_t;
+
+    %template(stdVectorInt) vector<int>;
+    %template(stdVectorChar) vector<char>;
+    %template(stdVectorSizeType) vector<long long>;
+    %template(stdPairIntInt) pair<int, int>;
+    %template(stdPairStringInt) pair<string, int>;
 }
 
 namespace boost {
@@ -26,9 +45,14 @@ namespace boost {
 
 namespace libtorrent
 {
-    typedef int64_t size_type;
-    class ptime;
     class time_duration;
+
+    time_duration milliseconds(int64_t n) {
+        return boost::chrono::milliseconds(n);
+    }
+    time_duration seconds(int64_t n) {
+        return boost::chrono::seconds(n);
+    }
 }
 
 %rename("%(camelcase)s", %$isclass) "";
@@ -40,11 +64,8 @@ namespace libtorrent
 %rename("%(camelcase)s", %$isnamespace) "";
 
 // These are problematic, ignore them for now
-%ignore libtorrent::absolutetime_nodeprecate_;
 %ignore libtorrent::throw_invalid_handle;
-%ignore libtorrent::session::add_extension;
 %ignore libtorrent::web_seed_entry;
-%ignore libtorrent::boosttime_nodeprecate_;
 %ignore libtorrent::boosttime_deprecated_;
 
 %ignore libtorrent::time_now_string;
@@ -57,6 +78,12 @@ namespace libtorrent
 %ignore libtorrent::detail::get_file_attributes;
 %ignore libtorrent::log_time;
 %ignore libtorrent::parse_int;
+%ignore libtorrent::blockinfo::setpeer;
+
+// Windows...
+%ignore libtorrent::file_status::block_special;
+%ignore libtorrent::file_status::link;
+%ignore libtorrent::file_status::socket;
 
 %include <boost/preprocessor/cat.hpp>
 %include <boost/version.hpp>
@@ -72,25 +99,19 @@ namespace libtorrent
 %include <libtorrent/export.hpp>
 %include <libtorrent/version.hpp>
 %include <libtorrent/build_config.hpp>
-%include <libtorrent/size_type.hpp>
 %include <libtorrent/error_code.hpp>
 %include <libtorrent/error.hpp>
 
-%include <libtorrent/fingerprint.hpp>
 %include "bitfield.i"
 %include "socket.i"
 %include <libtorrent/address.hpp>
 %include "torrent_info.i"
+%include <libtorrent/settings_pack.hpp>
 %include <libtorrent/session_settings.hpp>
 %include "peer_info.i"
 %include "torrent_handle.i"
-%include <libtorrent/session_status.hpp>
 %include "add_torrent_params.i"
 %include "alert.i"
 %include "alert_types.i"
-%include <libtorrent/ptime.hpp>
-%include <libtorrent/time.hpp>
 %include "create_torrent.i"
-%include "dht.i"
 %include "session.i"
-%include "ed25519.i"
