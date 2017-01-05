@@ -1,8 +1,7 @@
 %module libtorrent
 
 #pragma SWIG nowarn=204 // CPP #warning, ""unknown OS, assuming BSD"", ""unknown platform, assuming the longest path is 255"".
-// Identifier 'GetCArray' redefined (ignored) (Renamed from 'get_c_array'), previous definition of 'GetCArray' (Renamed from 'get_c_array').
-#pragma SWIG nowarn=302
+#pragma SWIG nowarn=302 // Identifier 'GetCArray' redefined (ignored) (Renamed from 'get_c_array'), previous definition of 'GetCArray' (Renamed from 'get_c_array').
 #pragma SWIG nowarn=312 // Nested union not currently supported (ignored).
 #pragma SWIG nowarn=314 // 'range' is a Go keyword, renaming to 'Xrange'
 #pragma SWIG nowarn=315 // Nothing known about 'boost::asio::ip::tcp'.
@@ -12,6 +11,7 @@
 #pragma SWIG nowarn=341 // The 'using' keyword in type aliasing is not fully supported yet.
 #pragma SWIG nowarn=401 // Nothing known about base class '<name>'. Ignored.
 #pragma SWIG nowarn=402 // Base class '<name>' is incomplete.
+#pragma SWIG nowarn=451 // Setting a const char * variable may leak memory.
 #pragma SWIG nowarn=503 // Can't wrap 'Operator ...' unless renamed to a valid identifier.
 #pragma SWIG nowarn=516 // Overloaded method ... ignored, using ... instead.
 #pragma SWIG nowarn=890 // Ignoring '...' due to Go name ('...') conflict with '...'
