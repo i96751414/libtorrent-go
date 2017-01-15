@@ -6,7 +6,9 @@
 
 %extend libtorrent::save_resume_data_alert {
     entry resume_data() const {
-        return *self->resume_data;
+        libtorrent::entry resume_data;
+        resume_data = *self->resume_data.get();
+        return resume_data;
     }
 }
 %ignore libtorrent::save_resume_data_alert::resume_data;
