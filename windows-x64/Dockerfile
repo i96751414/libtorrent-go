@@ -29,8 +29,12 @@ RUN mv /usr/bin/ar.orig /usr/bin/ar && \
     mv /usr/bin/ranlib.orig /usr/bin/ranlib
 
 # Install OpenSSL
-ENV OPENSSL_VERSION 1.0.2j
-RUN curl -L https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz | tar xz && \
+ENV OPENSSL_VERSION 1.0.2k
+ENV OPENSSL_SHA256 6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0
+RUN wget -q https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz -O openssl.tar.gz && \
+    echo "$OPENSSL_SHA256  openssl.tar.gz" | sha256sum -c - && \
+    tar -xzf openssl.tar.gz && \
+    rm openssl.tar.gz && \
     cd openssl-${OPENSSL_VERSION}/ && \
     CROSS_COMPILE=${CROSS_TRIPLE}- ./Configure threads no-shared mingw64 --prefix=${CROSS_ROOT} 1>log 2>err && \
     make -j $(cat /proc/cpuinfo | grep processor | wc -l) 1>log 2>err && \
@@ -48,9 +52,9 @@ RUN cd swig-rel-${SWIG_VERSION}/ && \
     rm -rf `pwd`
 
 # Install Golang
-ENV GOLANG_VERSION 1.7.4
+ENV GOLANG_VERSION 1.8rc3
 ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
-ENV GOLANG_SRC_SHA256 4c189111e9ba651a2bb3ee868aa881fab36b2f2da3409e80885ca758a6b614cc
+ENV GOLANG_SRC_SHA256 38b1c1738f111f7bccdd372efca2aa98a7bad1ca2cb21767ba69f34ae007499c
 
 ENV GOLANG_BOOTSTRAP_VERSION 1.4.3
 ENV GOLANG_BOOTSTRAP_URL https://golang.org/dl/go$GOLANG_BOOTSTRAP_VERSION.src.tar.gz
