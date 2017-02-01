@@ -84,7 +84,7 @@ ENV PATH ${PATH}:/usr/local/go/bin
 # Install libtorrent
 # Changes:
 # - define WIN32, _UNICODE, IPV6_TCLASS=39
-ENV LIBTORRENT_VERSION RC_1_1
+ENV LIBTORRENT_VERSION 1bef80c3fa6aa0d91e33fc48d4a89c1c6181f286
 RUN curl -L https://github.com/arvidn/libtorrent/archive/`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`.tar.gz | tar xz && \
     cd libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`/ && \
     ./autotool.sh && \
