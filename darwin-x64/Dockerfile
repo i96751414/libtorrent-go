@@ -42,7 +42,7 @@ RUN wget -q https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz -O 
     rm -rf `pwd`
 
 # Install SWIG
-ENV SWIG_VERSION 3.0.11
+ENV SWIG_VERSION 3.0.12
 RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | tar xz && \
     cd swig-rel-${SWIG_VERSION}/ && \
     ./autogen.sh && \
@@ -82,7 +82,7 @@ RUN set -ex \
 ENV PATH ${PATH}:/usr/local/go/bin
 
 # Install libtorrent
-ENV LIBTORRENT_VERSION 1bef80c3fa6aa0d91e33fc48d4a89c1c6181f286
+ENV LIBTORRENT_VERSION c00a25a6456a3ed1970258451bc3e39a561a1083
 RUN curl -L https://github.com/arvidn/libtorrent/archive/`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`.tar.gz | tar xz && \
     cd libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`/ && \
     ./autotool.sh && \
