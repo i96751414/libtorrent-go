@@ -37,9 +37,9 @@ RUN curl -L https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz | ta
     rm -rf `pwd`
 
 # Install Golang
-ENV GOLANG_VERSION 1.8rc3
+ENV GOLANG_VERSION 1.8
 ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
-ENV GOLANG_SRC_SHA256 38b1c1738f111f7bccdd372efca2aa98a7bad1ca2cb21767ba69f34ae007499c
+ENV GOLANG_SRC_SHA256 406865f587b44be7092f206d73fc1de252600b79b3cacc587b74b5ef5c623596
 
 ENV GOLANG_BOOTSTRAP_VERSION 1.4.3
 ENV GOLANG_BOOTSTRAP_URL https://golang.org/dl/go$GOLANG_BOOTSTRAP_VERSION.src.tar.gz
@@ -67,7 +67,7 @@ RUN set -ex \
 ENV PATH ${PATH}:/usr/local/go/bin
 
 # Install libtorrent
-ENV LIBTORRENT_VERSION c00a25a6456a3ed1970258451bc3e39a561a1083
+ENV LIBTORRENT_VERSION 430ff6d7b45f4d30d51593a026ca4c7b3db0e9be
 RUN curl -L https://github.com/arvidn/libtorrent/archive/`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`.tar.gz | tar xz && \
     cd libtorrent-`echo ${LIBTORRENT_VERSION} | sed 's/\\./_/g'`/ && \
     ./autotool.sh && \
