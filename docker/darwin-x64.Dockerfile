@@ -70,6 +70,6 @@ ENV PATH ${PATH}:/usr/local/go/bin
 # Install libtorrent
 COPY scripts/build-libtorrent.sh /build/
 ENV LT_CC ${CROSS_TRIPLE}-cc
-ENV LT_CXX ${CROSS_TRIPLE}-c++
+ENV LT_CXX ${CROSS_TRIPLE}-c++ -Wno-c++11-extensions -Wno-c++11-long-long
 ENV LT_OSXCROSS TRUE
 RUN ./build-libtorrent.sh
