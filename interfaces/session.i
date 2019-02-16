@@ -12,6 +12,8 @@
 #include <libtorrent/session_handle.hpp>
 %}
 
+%feature("director") session_handle;
+
 // These are problematic, so we ignore them.
 %ignore libtorrent::session_handle::add_extension;
 %ignore libtorrent::session_handle::dht_put_item;

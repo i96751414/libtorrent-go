@@ -41,6 +41,10 @@
 %ignore libtorrent::block_info::peer; // linux_arm
 %ignore libtorrent::block_info::set_peer; // linux_arm
 
+%feature("director") torrent_handle;
+%feature("director") torrent_info;
+%feature("director") torrent_status;
+
 %include <libtorrent/entry.hpp>
 %include <libtorrent/torrent_info.hpp>
 %include <libtorrent/torrent_handle.hpp>

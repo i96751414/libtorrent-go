@@ -8,6 +8,7 @@ DOCKER = docker
 DOCKER_IMAGE = $(NAME)
 PLATFORMS = \
 	android-arm \
+	android-arm64 \
 	android-x64 \
 	android-x86 \
 	darwin-x64 \
@@ -18,6 +19,26 @@ PLATFORMS = \
 	linux-x86 \
 	windows-x64 \
 	windows-x86
+
+BOOST_VERSION = 1.69.0
+BOOST_VERSION_FILE = $(shell echo $(BOOST_VERSION) | sed s/\\./_/g)
+BOOST_SHA256 = 8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406
+
+OPENSSL_VERSION = 1.1.1a
+OPENSSL_SHA256 = fc20130f8b7cbd2fb918b2f14e2f429e109c31ddd0fb38fc5d71d9ffed3f9f41
+
+SWIG_VERSION = 3.0.12
+SWIG_SHA256 = 64971de92b8a1da0b9ffb4b51e9214bb936c4dbbc304367899cdb07280b94af6
+
+GOLANG_VERSION = 1.11.5
+GOLANG_SRC_URL = https://golang.org/dl/go$(GOLANG_VERSION).src.tar.gz
+GOLANG_SRC_SHA256 = bc1ef02bb1668835db1390a2e478dcbccb5dd16911691af9d75184bbe5aa943e
+
+GOLANG_BOOTSTRAP_VERSION = 1.4-bootstrap-20170531
+GOLANG_BOOTSTRAP_URL = https://dl.google.com/go/go$(GOLANG_BOOTSTRAP_VERSION).tar.gz
+GOLANG_BOOTSTRAP_SHA256 = 49f806f66762077861b7de7081f586995940772d29d4c45068c134441a743fa2
+
+LIBTORRENT_VERSION = RC_1_1
 
 include platform_host.mk
 
@@ -67,7 +88,7 @@ ifneq ($(CROSS_ROOT),)
 	PKG_CONFIG_PATH = $(CROSS_ROOT)/lib/pkgconfig
 endif
 
-LIBTORRENT_CFLAGS = $(CFLAGS) $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --cflags libtorrent-rasterbar)
+LIBTORRENT_CFLAGS = $(CFLAGS) $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --cflags libtorrent-rasterbar) -std=c++11
 LIBTORRENT_LDFLAGS = $(LDFLAGS) $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --static --libs libtorrent-rasterbar)
 DEFINE_IGNORES = __STDC__|_cdecl|__cdecl|_fastcall|__fastcall|_stdcall|__stdcall|__declspec
 CC_DEFINES = $(shell echo | $(CC) -dM -E - | grep -v -E "$(DEFINE_IGNORES)" | sed -E "s/\#define[[:space:]]+([a-zA-Z0-9_()]+)[[:space:]]+(.*)/-D\1="\2"/g" | tr '\n' ' ')
@@ -79,10 +100,14 @@ ifeq ($(TARGET_OS), windows)
 		CC_DEFINES += -DSWIGWORDSIZE32
 	endif
 else ifeq ($(TARGET_OS), darwin)
-	CC := $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang
-	CXX := $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang++
+	CC = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang
+	CXX = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang++
 	CC_DEFINES += -DSWIGMAC
 	CC_DEFINES += -DBOOST_HAS_PTHREADS
+else ifeq ($(TARGET_OS), android)
+	CC = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang
+	CXX = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang++
+	GO_LDFLAGS += -flto
 endif
 
 
@@ -118,7 +143,23 @@ clean:
 re: clean build
 
 env:
-	$(DOCKER) build -t $(DOCKER_IMAGE):$(PLATFORM) $(PLATFORM)
+	$(DOCKER) build \
+		--build-arg BOOST_VERSION=$(BOOST_VERSION) \
+		--build-arg BOOST_VERSION_FILE=$(BOOST_VERSION_FILE) \
+		--build-arg BOOST_SHA256=$(BOOST_SHA256) \
+		--build-arg OPENSSL_VERSION=$(OPENSSL_VERSION) \
+		--build-arg OPENSSL_SHA256=$(OPENSSL_SHA256) \
+		--build-arg SWIG_VERSION=$(SWIG_VERSION) \
+		--build-arg SWIG_SHA256=$(SWIG_SHA256) \
+		--build-arg GOLANG_VERSION=$(GOLANG_VERSION) \
+		--build-arg GOLANG_SRC_URL=$(GOLANG_SRC_URL) \
+		--build-arg GOLANG_SRC_SHA256=$(GOLANG_SRC_SHA256) \
+		--build-arg GOLANG_BOOTSTRAP_VERSION=$(GOLANG_BOOTSTRAP_VERSION) \
+		--build-arg GOLANG_BOOTSTRAP_URL=$(GOLANG_BOOTSTRAP_URL) \
+		--build-arg GOLANG_BOOTSTRAP_SHA256=$(GOLANG_BOOTSTRAP_SHA256) \
+		--build-arg LIBTORRENT_VERSION=$(LIBTORRENT_VERSION) \
+		-t $(DOCKER_IMAGE):$(PLATFORM) \
+		-f docker/$(PLATFORM).Dockerfile docker
 
 envs:
 	for i in $(PLATFORMS); do \
@@ -132,3 +173,14 @@ pull:
 push:
 	docker tag libtorrent-go:$(PLATFORM) $(PROJECT)/libtorrent-go:$(PLATFORM)
 	docker push $(PROJECT)/libtorrent-go:$(PLATFORM)
+
+runtest:
+	CC=${CC} CXX=$(CXX) \
+	PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) \
+	CGO_ENABLED=1 \
+	GOOS=$(GOOS) GOARCH=$(GOARCH) GOARM=$(GOARM) \
+	PATH=.:$$PATH \
+	cd test; go run -x test.go; cd ..
+
+retest:
+	$(DOCKER) run --rm -v $(GOPATH):/go -v $(shell pwd):/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):linux-x64 make runtest;

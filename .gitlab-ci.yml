@@ -45,6 +45,17 @@ android-arm-hub:
     PLATFORM: android-arm
   <<: *push_definition
 
+android-arm64:
+  stage: build
+  variables:
+    PLATFORM: android-arm64
+  <<: *build_definition
+android-arm64-hub:
+  stage: push
+  variables:
+    PLATFORM: android-arm64
+  <<: *push_definition
+
 android-x64:
   stage: build
   variables:

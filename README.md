@@ -14,7 +14,6 @@ Changes
 + save and load resume_data support
 + crashes on Android ARM fixed
 
-
 Download and Build
 ------------------
 
@@ -46,7 +45,7 @@ Download and Build
 
 + Build libtorrent-go:
 
-        make [ android-arm | android-x86 | android-x64 |
+        make [ android-arm | android-arm64 | android-x86 | android-x64 |
                linux-x86   | linux-x64   | linux-arm   | linux-armv7 | linux-arm64 |
                windows-x86 | windows-x64 | darwin-x64  ]
 
