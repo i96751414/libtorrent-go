@@ -68,9 +68,6 @@ namespace libtorrent
 %ignore libtorrent::throw_invalid_handle;
 %ignore libtorrent::web_seed_entry;
 %ignore libtorrent::boosttime_deprecated_;
-%ignore libtorrent::announce_entry;
-%ignore libtorrent::alert_manager::wait_for_alert;
-%ignore libtorrent::session_handle::wait_for_alert;
 
 %ignore libtorrent::time_now_string;
 %ignore libtorrent::merkle_num_leafs;
