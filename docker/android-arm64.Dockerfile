@@ -24,6 +24,7 @@ ARG LIBTORRENT_VERSION
 # COPY files/rel-${SWIG_VERSION}.tar.gz /build/
 # COPY files/go${GOLANG_VERSION}.src.tar.gz /build/golang.tar.gz
 # COPY files/go${GOLANG_BOOTSTRAP_VERSION}.tar.gz /build/golang-bootstrap.tar.gz
+# COPY files/${LIBTORRENT_VERSION}.tar.gz /build/
 
 # Install Boost.System
 COPY scripts/build-boost.sh /build/
@@ -59,5 +60,5 @@ ENV LT_CC ${CROSS_TRIPLE}-clang
 ENV LT_CXX ${CROSS_TRIPLE}-clang++
 ENV LT_PTHREADS TRUE
 ENV LT_FLAGS -fPIC -fPIE
-ENV LT_CXXFLAGS -std=c++11 -Wno-macro-redefined
+ENV LT_CXXFLAGS -Wno-macro-redefined -Wno-c++11-extensions
 RUN ./build-libtorrent.sh
