@@ -21,9 +21,10 @@ ARG LIBTORRENT_VERSION
 # Local testing
 # COPY files/boost_${BOOST_VERSION_FILE}.tar.bz2 /build/
 # COPY files/openssl-${OPENSSL_VERSION}.tar.gz /build/
-# COPY files/rel-${SWIG_VERSION}.tar.gz /build/
+# COPY files/swig-${SWIG_VERSION}.tar.gz /build/
 # COPY files/go${GOLANG_VERSION}.src.tar.gz /build/golang.tar.gz
 # COPY files/go${GOLANG_BOOTSTRAP_VERSION}.tar.gz /build/golang-bootstrap.tar.gz
+# COPY files/${LIBTORRENT_VERSION}.tar.gz /build/
 
 # Install Boost.System
 COPY scripts/build-boost.sh /build/

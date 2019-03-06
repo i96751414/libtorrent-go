@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 set -ex
-if [ ! -f "rel-${SWIG_VERSION}.tar.gz" ]; then
-  wget -q https://github.com/swig/swig/archive/rel-${SWIG_VERSION}.tar.gz
+if [ ! -f "swig-${SWIG_VERSION}.tar.gz" ]; then
+  wget -q https://github.com/swig/swig/archive/${SWIG_VERSION}.tar.gz -O swig-${SWIG_VERSION}.tar.gz
 fi
-echo "$SWIG_SHA256  rel-${SWIG_VERSION}.tar.gz" | sha256sum -c -
-tar -xzf rel-${SWIG_VERSION}.tar.gz
-rm rel-${SWIG_VERSION}.tar.gz
-cd swig-rel-${SWIG_VERSION}/
+echo "$SWIG_SHA256  swig-${SWIG_VERSION}.tar.gz" | sha256sum -c -
+tar -xzf swig-${SWIG_VERSION}.tar.gz
+rm swig-${SWIG_VERSION}.tar.gz
+cd swig-${SWIG_VERSION}/
 ./autogen.sh 1>log 2>err
 ./configure 1>log 2>err
 make -j $(cat /proc/cpuinfo | grep processor | wc -l) 1>log 2>err
