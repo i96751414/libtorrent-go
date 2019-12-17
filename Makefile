@@ -1,6 +1,6 @@
 PROJECT = quasarhq
 NAME = libtorrent-go
-GO_PACKAGE = github.com/scakemyer/$(NAME)
+GO_PACKAGE = github.com/i96751414/$(NAME)
 CC = cc
 CXX = c++
 PKG_CONFIG = pkg-config
@@ -113,8 +113,8 @@ else ifeq ($(TARGET_OS), android)
 endif
 
 
-OUT_PATH = $(shell go env GOPATH)/pkg/$(GOOS)_$(GOARCH)$(PATH_SUFFIX)
-OUT_LIBRARY = $(OUT_PATH)/$(GO_PACKAGE).a
+OUT_PATH = "$(shell go env GOPATH)/pkg/$(GOOS)_$(GOARCH)$(PATH_SUFFIX)"
+OUT_LIBRARY = "$(OUT_PATH)/$(GO_PACKAGE).a"
 
 .PHONY: $(PLATFORMS)
 
@@ -127,7 +127,7 @@ $(PLATFORMS):
 ifeq ($@, all)
 	$(MAKE) all
 else
-	$(DOCKER) run --rm -v $(GOPATH):/go -v $(shell pwd):/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):$@ make re;
+	$(DOCKER) run --rm -v "$(GOPATH)":/go -v "$(shell pwd)":/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):$@ make re;
 endif
 
 build:
@@ -140,7 +140,7 @@ build:
 	go install -v -ldflags '$(GO_LDFLAGS)' -x $(PKGDIR)
 
 clean:
-	rm -rf $(OUT_LIBRARY)
+	rm -rf "$(OUT_LIBRARY)"
 
 re: clean build
 
@@ -185,4 +185,4 @@ runtest:
 	cd test; go run -x test.go; cd ..
 
 retest:
-	$(DOCKER) run --rm -v $(GOPATH):/go -v $(shell pwd):/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):linux-x64 make runtest;
+	$(DOCKER) run --rm -v "$(GOPATH)":/go -v "$(shell pwd)":/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):linux-x64 make runtest;
