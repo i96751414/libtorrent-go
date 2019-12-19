@@ -1,4 +1,4 @@
-PROJECT = quasarhq
+PROJECT = i96751414
 NAME = libtorrent-go
 GO_PACKAGE = github.com/i96751414/$(NAME)
 CC = cc
