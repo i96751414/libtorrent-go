@@ -113,7 +113,10 @@ else ifeq ($(TARGET_OS), android)
 endif
 
 
-GOPATH = $(shell go env GOPATH)
+ifeq ($(GOPATH),)
+	GOPATH = $(shell go env GOPATH)
+endif
+
 OUT_PATH = "$(GOPATH)/pkg/$(GOOS)_$(GOARCH)$(PATH_SUFFIX)"
 OUT_LIBRARY = "$(OUT_PATH)/$(GO_PACKAGE).a"
 
