@@ -118,3 +118,4 @@ namespace libtorrent
 %include "interfaces/alert_types.i"
 %include "interfaces/create_torrent.i"
 %include "interfaces/session.i"
+%include "interfaces/magnet_uri.i"
