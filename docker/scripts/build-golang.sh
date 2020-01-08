@@ -22,5 +22,11 @@ rm golang.tar.gz
 cd /usr/local/go/src
 ./make.bash 1>/dev/null 2>/dev/null
 
-CC_FOR_TARGET=${GOLANG_CC} CXX_FOR_TARGET=${GOLANG_CXX} GOOS=${GOLANG_OS} GOARCH=${GOLANG_ARCH} GOARM=${GOLANG_ARM} CGO_ENABLED=1 ./make.bash --no-clean
+CC_FOR_TARGET=${GOLANG_CC} \
+  CXX_FOR_TARGET=${GOLANG_CXX} \
+  GOOS=${GOLANG_OS} \
+  GOARCH=${GOLANG_ARCH} \
+  GOARM=${GOLANG_ARM} \
+  CGO_ENABLED=1 \
+  ./make.bash --no-clean
 rm -rf /usr/local/bootstrap /usr/local/go/pkg/bootstrap
