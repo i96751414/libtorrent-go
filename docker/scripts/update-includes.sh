@@ -85,6 +85,7 @@ replaceBits "file.hpp" \
   "alert.hpp" \
   "create_torrent.hpp" \
   "pex_flags.hpp" \
+  "torrent_flags.hpp" \
   "session_handle.hpp" \
   "alert_types.hpp"
 

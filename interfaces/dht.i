@@ -1,7 +1,7 @@
 %{
-#include <libtorrent/kademlia/item.hpp>
-#include <libtorrent/ed25519.hpp>
-#include <boost/bind.hpp>
+#include "libtorrent/kademlia/item.hpp"
+#include "libtorrent/ed25519.hpp"
+#include "boost/bind.hpp"
 %}
 
 %{

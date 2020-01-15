@@ -38,22 +38,6 @@ namespace std {
     %template(stdPairStringInt) pair<string, int>;
 }
 
-/*namespace boost {
-    typedef ::int64_t int64_t;
-}
-
-namespace libtorrent
-{
-    class time_duration;
-
-    time_duration milliseconds(int64_t n) {
-        return boost::chrono::milliseconds(n);
-    }
-
-    time_duration seconds(int64_t n) {
-        return boost::chrono::seconds(n);
-    }
-}*/
 
 %rename("%(camelcase)s", %$isclass) "";
 %rename("%(camelcase)s", %$isvariable) "";
@@ -108,47 +92,92 @@ namespace libtorrent
 
 %include "interfaces/boost_array.i"
 
-// TODO: Convert everything into interfaces
+// Libtorrent exports
+%include <libtorrent/aux_/export.hpp>
+
+// Define the namespaces we are using
+namespace libtorrent {
+    namespace aux {}
+}
+
+// Fix for inline namespace macro declaration (libtorrent::v1_2) - swig seems not to support this
+// used on:
+// struct announce_entry
+// struct peer_info
+// struct torrent_status
+// struct add_torrent_params
+#ifdef TORRENT_VERSION_NAMESPACE_2
+#undef TORRENT_VERSION_NAMESPACE_2
+#define TORRENT_VERSION_NAMESPACE_2
+#endif
+#ifdef TORRENT_VERSION_NAMESPACE_2_END
+#undef TORRENT_VERSION_NAMESPACE_2_END
+#define TORRENT_VERSION_NAMESPACE_2_END
+#endif
+
+// Used libtorrent includes which are not on interfaces
 %{
-#include <libtorrent/config.hpp>
-#include <libtorrent/version.hpp>
-#include <libtorrent/operations.hpp>
-#include <libtorrent/error_code.hpp>
-#include <libtorrent/error.hpp>
-#include <libtorrent/time.hpp>
+#include "libtorrent/torrent.hpp"
+
+#include <libtorrent/extensions/smart_ban.hpp>
+#include <libtorrent/extensions/ut_metadata.hpp>
+#include <libtorrent/extensions/ut_pex.hpp>
 %}
 
-%include <libtorrent/aux_/export.hpp>
-%include <libtorrent/config.hpp>
-%include <libtorrent/version.hpp>
-%include <libtorrent/version.hpp>
-%include <libtorrent/operations.hpp>
-%include <libtorrent/error_code.hpp>
-%include <libtorrent/error.hpp>
-%include <libtorrent/fwd.hpp>
-%include <libtorrent/address.hpp>
-%include <libtorrent/string_view.hpp>
-%include <libtorrent/time.hpp>
-
-%include "interfaces/units.i"
-%include "interfaces/flags.i"
-%include "interfaces/download_priority.i"
-%include "interfaces/bitfield.i"
-%include "interfaces/socket.i"
-%include "interfaces/span.i"
-%include <libtorrent/sha1_hash.hpp>
-%include "interfaces/entry.i"
-%include <libtorrent/peer_id.hpp>
-%include "interfaces/file_storage.i"
-%include "interfaces/announce_entry.i"
-%include "interfaces/torrent_info.i"
-%include "interfaces/settings_pack.i"
-%include <libtorrent/session_settings.hpp>
-%include "interfaces/peer_info.i"
-%include "interfaces/torrent_handle.i"
-%include "interfaces/add_torrent_params.i"
-%include "interfaces/alert.i"
-%include "interfaces/alert_types.i"
-%include "interfaces/create_torrent.i"
-%include "interfaces/session.i"
-%include "interfaces/magnet_uri.i"
+// TODO: ignore all internals
+%include "interfaces/libtorrent/config.i"
+%include "interfaces/libtorrent/version.i"
+%include "interfaces/libtorrent/operations.i"
+%include "interfaces/libtorrent/units.i"
+%include "interfaces/libtorrent/error_code.i"
+%include "interfaces/libtorrent/error.i"
+%include "interfaces/libtorrent/fwd.i"
+%include "interfaces/libtorrent/address.i"
+%include "interfaces/libtorrent/string_view.i"
+%include "interfaces/libtorrent/time.i"
+%include "interfaces/libtorrent/flags.i"
+%include "interfaces/libtorrent/download_priority.i"
+%include "interfaces/libtorrent/bitfield.i"
+%include "interfaces/libtorrent/socket.i"
+%include "interfaces/libtorrent/span.i"
+%include "interfaces/libtorrent/sha1_hash.i"
+%include "interfaces/libtorrent/bdecode.i"
+%include "interfaces/libtorrent/entry.i"
+%include "interfaces/libtorrent/peer_id.i"
+%include "interfaces/libtorrent/peer_request.i"
+%include "interfaces/libtorrent/file_storage.i"
+%include "interfaces/libtorrent/announce_entry.i"
+%include "interfaces/libtorrent/index_range.i"
+%include "interfaces/libtorrent/torrent_info.i"
+%include "interfaces/libtorrent/settings_pack.i"
+%include "interfaces/libtorrent/session_settings.i"
+%include "interfaces/libtorrent/peer_info.i"
+%include "interfaces/libtorrent/storage_defs.i"
+%include "interfaces/libtorrent/pex_flags.i"
+%include "interfaces/libtorrent/torrent_flags.i"
+%include "interfaces/libtorrent/torrent_status.i"
+%include "interfaces/libtorrent/torrent_handle.i"
+%include "interfaces/libtorrent/add_torrent_params.i"
+%include "interfaces/libtorrent/alert.i"
+%include "interfaces/libtorrent/alert_manager.i"
+%include "interfaces/libtorrent/close_reason.i"
+%include "interfaces/libtorrent/portmap.i"
+%include "interfaces/libtorrent/session_stats.i"
+%include "interfaces/libtorrent/piece_block.i"
+%include "interfaces/libtorrent/alert_types.i"
+%include "interfaces/libtorrent/create_torrent.i"
+%include "interfaces/libtorrent/io_service.i"
+%include "interfaces/libtorrent/ip_filter.i"
+%include "interfaces/libtorrent/kademlia/node_id.i"
+%include "interfaces/libtorrent/kademlia/types.i"
+%include "interfaces/libtorrent/kademlia/dht_storage.i"
+%include "interfaces/libtorrent/bandwidth_limit.i"
+%include "interfaces/libtorrent/peer_class.i"
+%include "interfaces/libtorrent/peer_class_type_filter.i"
+%include "interfaces/libtorrent/session_types.i"
+%include "interfaces/libtorrent/session_status.i"
+%include "interfaces/libtorrent/session_handle.i"
+%include "interfaces/libtorrent/session.i"
+%include "interfaces/libtorrent/magnet_uri.i"
+%include "interfaces/libtorrent/write_resume_data.i"
+%include "interfaces/libtorrent/read_resume_data.i"

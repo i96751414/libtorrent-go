@@ -1,5 +1,5 @@
 %{
-#include <boost/array.hpp>
+#include "boost/array.hpp"
 %}
 
 %typemap(gotype) boost::array<char, 32>, boost::array<char, 64>, boost::array<char, 32>*, boost::array<char, 64>*  "[]byte"
@@ -23,4 +23,4 @@
     $result.cap = $result.len;
 %}
 
-%include <boost/array.hpp>
+%include "boost/array.hpp"
