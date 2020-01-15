@@ -1,11 +1,14 @@
 %{
 #include <libtorrent/io_service.hpp>
 #include <libtorrent/ip_filter.hpp>
+#include <libtorrent/kademlia/node_id.hpp>
+#include <libtorrent/kademlia/types.hpp>
 #include <libtorrent/kademlia/dht_storage.hpp>
 #include <libtorrent/bandwidth_limit.hpp>
 #include <libtorrent/peer_class.hpp>
 #include <libtorrent/peer_class_type_filter.hpp>
 #include <libtorrent/settings_pack.hpp>
+#include <libtorrent/session_types.hpp>
 #include <libtorrent/session.hpp>
 #include <libtorrent/session_stats.hpp>
 #include <libtorrent/session_status.hpp>
@@ -14,9 +17,30 @@
 
 %feature("director") session_handle;
 
+// SWIG does not support unique_ptr yet
+%ignore libtorrent::dht::dht_default_storage_constructor;
+
 // These are problematic, so we ignore them.
 %ignore libtorrent::session_handle::add_extension;
 %ignore libtorrent::session_handle::dht_put_item;
+
+%ignore libtorrent::session_proxy::session_proxy(session_proxy&&);
+%ignore libtorrent::session_params::session_params(settings_pack&&);
+%ignore libtorrent::session_params::session_params(settings_pack&&, std::vector<std::shared_ptr<plugin>>);
+%ignore libtorrent::session_params::session_params(session_params&&);
+%ignore libtorrent::session::session(session_params&&);
+%ignore libtorrent::session::session(session_params&&, io_service&);
+%ignore libtorrent::session::session(settings_pack&&, session_flags_t const);
+%ignore libtorrent::session::session(settings_pack&&);
+%ignore libtorrent::session::session(session&&);
+%ignore libtorrent::session::session(settings_pack&&, io_service&, session_flags_t const);
+%ignore libtorrent::session::session(settings_pack&&, io_service&);
+
+%ignore libtorrent::session_handle::session_handle(session_handle&&);
+%ignore libtorrent::session_handle::add_torrent(add_torrent_params&&);
+%ignore libtorrent::session_handle::add_torrent(add_torrent_params&&, error_code&);
+%ignore libtorrent::session_handle::async_add_torrent(add_torrent_params&&);
+%ignore libtorrent::session_handle::apply_settings(settings_pack&&);
 
 %template(stdVectorAlerts) std::vector<libtorrent::alert*>;
 
@@ -34,14 +58,25 @@
 }
 %ignore libtorrent::session_handle::pop_alerts;
 
+namespace libtorrent {
+    struct peer_class_tag;
+    struct save_state_flags_tag;
+    struct session_flags_tag;
+    struct remove_flags_tag;
+    struct reopen_network_flags_tag;
+}
+
 %include "extensions.i"
 %include <libtorrent/io_service.hpp>
 %include <libtorrent/ip_filter.hpp>
+%include <libtorrent/kademlia/node_id.hpp>
+%include <libtorrent/kademlia/types.hpp>
 %include <libtorrent/kademlia/dht_storage.hpp>
 %include <libtorrent/bandwidth_limit.hpp>
 %include <libtorrent/peer_class.hpp>
 %include <libtorrent/peer_class_type_filter.hpp>
 %include <libtorrent/settings_pack.hpp>
+%include <libtorrent/session_types.hpp>
 %include <libtorrent/session.hpp>
 %include <libtorrent/session_stats.hpp>
 %include <libtorrent/session_status.hpp>

@@ -1,19 +1,21 @@
 %{
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <libtorrent/add_torrent_params.hpp>
 %}
 
-%extend libtorrent::add_torrent_params {
+%extend libtorrent::v1_2::add_torrent_params {
 	const libtorrent::torrent_info* get_torrent_info() {
 		return self->ti.get();
 	}
 	void set_torrent_info(libtorrent::torrent_info torrent_info) {
-		boost::shared_ptr<libtorrent::torrent_info> ptr;
-		ptr = boost::make_shared<libtorrent::torrent_info>(torrent_info);
-		self->ti = ptr;
+		self->ti = std::make_shared<libtorrent::torrent_info>(torrent_info);
 	}
 }
-%ignore libtorrent::add_torrent_params::ti;
+
+%ignore libtorrent::v1_2::add_torrent_params::ti;
+%ignore libtorrent::v1_2::add_torrent_params::add_torrent_params(add_torrent_params&&);
 
 %include <libtorrent/add_torrent_params.hpp>
+
+%{
+using libtorrent::add_torrent_params;
+%}

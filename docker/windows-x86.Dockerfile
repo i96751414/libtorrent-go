@@ -54,6 +54,7 @@ RUN ./build-golang.sh
 ENV PATH ${PATH}:/usr/local/go/bin
 
 # Install libtorrent
+COPY scripts/update-includes.sh /build/
 COPY scripts/build-libtorrent.sh /build/
 ENV LT_CC ${CROSS_TRIPLE}-cc
 ENV LT_CXX ${CROSS_TRIPLE}-c++

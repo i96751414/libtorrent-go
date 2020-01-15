@@ -16,14 +16,12 @@
 #pragma SWIG nowarn=516 // Overloaded method ... ignored, using ... instead.
 #pragma SWIG nowarn=890 // Ignoring '...' due to Go name ('...') conflict with '...'
 
-%{
-// #include <boost/chrono.hpp>
-// #include <libtorrent/time.hpp>
-%}
-
 %include <stl.i>
 %include <stdint.i>
 %include <typemaps.i>
+%include <std_vector.i>
+%include <std_pair.i>
+%include <carrays.i>
 
 #define BOOST_POSIX_API
 #define BOOST_NO_TYPEID
@@ -40,7 +38,7 @@ namespace std {
     %template(stdPairStringInt) pair<string, int>;
 }
 
-namespace boost {
+/*namespace boost {
     typedef ::int64_t int64_t;
 }
 
@@ -51,10 +49,11 @@ namespace libtorrent
     time_duration milliseconds(int64_t n) {
         return boost::chrono::milliseconds(n);
     }
+
     time_duration seconds(int64_t n) {
         return boost::chrono::seconds(n);
     }
-}
+}*/
 
 %rename("%(camelcase)s", %$isclass) "";
 %rename("%(camelcase)s", %$isvariable) "";
@@ -80,6 +79,9 @@ namespace libtorrent
 %ignore libtorrent::log_time;
 %ignore libtorrent::parse_int;
 %ignore libtorrent::blockinfo::setpeer;
+%ignore libtorrent::aux;
+%ignore libtorrent::apply_pack;
+%ignore libtorrent::apply_pack_impl;
 
 // Windows...
 %ignore libtorrent::file_status::block_special;
@@ -93,23 +95,47 @@ namespace libtorrent
 %include <boost/asio/detail/config.hpp>
 %include <boost/asio/error.hpp>
 
-%include <boost/system/error_code.hpp>
+/*%include <boost/system/error_code.hpp>
 %include <boost/system/system_error.hpp>
 
-%include "interfaces/boost_array.i"
+//%include "interfaces/boost_array.i"*/
 
+
+// TODO: Convert everything into interfaces
+%{
+#include <libtorrent/config.hpp>
+#include <libtorrent/version.hpp>
+#include <libtorrent/operations.hpp>
+#include <libtorrent/error_code.hpp>
+#include <libtorrent/error.hpp>
+#include <libtorrent/time.hpp>
+%}
+
+%include <libtorrent/aux_/export.hpp>
 %include <libtorrent/config.hpp>
-%include <libtorrent/export.hpp>
 %include <libtorrent/version.hpp>
-%include <libtorrent/build_config.hpp>
+%include <libtorrent/version.hpp>
+%include <libtorrent/operations.hpp>
 %include <libtorrent/error_code.hpp>
 %include <libtorrent/error.hpp>
+%include <libtorrent/fwd.hpp>
+%include <libtorrent/address.hpp>
+%include <libtorrent/string_view.hpp>
+%include <libtorrent/time.hpp>
 
+%include "interfaces/units.i"
+%include "interfaces/flags.i"
+%include "interfaces/download_priority.i"
 %include "interfaces/bitfield.i"
 %include "interfaces/socket.i"
-%include <libtorrent/address.hpp>
+%include "interfaces/span.i"
+%include <libtorrent/sha1_hash.hpp>
+%include "interfaces/entry.i"
+%include <libtorrent/peer_id.hpp>
+%include "interfaces/file_storage.i"
+%include "interfaces/announce_entry.i"
 %include "interfaces/torrent_info.i"
-%include <libtorrent/settings_pack.hpp>
+%include "interfaces/settings_pack.i"
 %include <libtorrent/session_settings.hpp>
 %include "interfaces/peer_info.i"
 %include "interfaces/torrent_handle.i"

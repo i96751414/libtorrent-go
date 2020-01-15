@@ -1,7 +1,11 @@
 %{
 #include <sstream>
 #include <libtorrent/bencode.hpp>
+#include <libtorrent/bdecode.hpp>
 %}
+
+%ignore libtorrent::entry::entry(entry&&);
+%ignore libtorrent::bdecode_node::bdecode_node(bdecode_node&&);
 
 %include <libtorrent/entry.hpp>
 %include <libtorrent/bdecode.hpp>

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -ex
+scripts_path=$(dirname "$(readlink -f "$0")")
 if [ -v LT_PTHREADS ]; then
   echo "#define BOOST_SP_USE_PTHREADS" >>"${CROSS_ROOT}/include/boost/config/user.hpp"
 fi
@@ -10,6 +11,7 @@ fi
 tar -xzf "${LIBTORRENT_VERSION}.tar.gz"
 rm "${LIBTORRENT_VERSION}.tar.gz"
 cd "libtorrent-${LIBTORRENT_VERSION//\\./_}"
+LIBTORRENT_INCLUDE="$(pwd)/include/libtorrent" "${scripts_path}/update-includes.sh"
 ./autotool.sh
 # shellcheck disable=SC2016
 sed -i 's/$PKG_CONFIG openssl --libs-only-/$PKG_CONFIG openssl --static --libs-only-/' ./configure

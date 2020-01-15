@@ -1,19 +1,12 @@
 %{
-#include <libtorrent/torrent_info.hpp>
-#include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/torrent_status.hpp>
+#include <libtorrent/pex_flags.hpp>
+#include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/torrent.hpp>
-#include <libtorrent/entry.hpp>
-#include <libtorrent/announce_entry.hpp>
+#include <libtorrent/storage_defs.hpp>
 %}
 
-%include <std_vector.i>
-%include <std_pair.i>
-%include <carrays.i>
-
-// %template(stdVectorPeerInfo) std::vector<libtorrent::peer_info>;
 %template(stdVectorPartialPieceInfo) std::vector<libtorrent::partial_piece_info>;
-%template(stdVectorAnnounceEntry) std::vector<libtorrent::announce_entry>;
 %template(stdVectorTorrentHandle) std::vector<libtorrent::torrent_handle>;
 
 // Equaler interface
@@ -41,13 +34,31 @@
 %ignore libtorrent::block_info::peer; // linux_arm
 %ignore libtorrent::block_info::set_peer; // linux_arm
 
-%feature("director") torrent_handle;
-%feature("director") torrent_info;
-%feature("director") torrent_status;
+%ignore libtorrent::v1_2::torrent_status::torrent_status(torrent_status&&);
+//%ignore libtorrent::torrent_status::torrent_status(torrent_status&&);
+%ignore libtorrent::torrent_handle::torrent_handle(torrent_handle&&);
 
-%include <libtorrent/entry.hpp>
-%include <libtorrent/torrent_info.hpp>
-%include <libtorrent/torrent_handle.hpp>
+namespace libtorrent {
+    struct torrent_flags_t;
+
+    struct pex_flags_tag;
+
+    struct status_flags_tag;
+    struct add_piece_flags_tag;
+    struct pause_flags_tag;
+	struct deadline_flags_tag;
+	struct resume_data_flags_tag;
+	struct reannounce_flags_tag;
+	struct queue_position_tag;
+}
+
+%include <libtorrent/storage_defs.hpp>
 %include <libtorrent/torrent_status.hpp>
-#include <libtorrent/torrent.hpp>
-%include <libtorrent/announce_entry.hpp>
+%include <libtorrent/pex_flags.hpp>
+%include <libtorrent/torrent_handle.hpp>
+//%include <libtorrent/torrent.hpp>
+
+%{
+using libtorrent::torrent_status;
+using libtorrent::queue_position_t;
+%}

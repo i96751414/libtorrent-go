@@ -8,5 +8,6 @@
     }
 }
 %ignore libtorrent::bitfield::bytes;
+%ignore libtorrent::bitfield::bitfield(bitfield &&);
 
 %include <libtorrent/bitfield.hpp>
