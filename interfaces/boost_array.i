@@ -1,6 +1,5 @@
 %{
 #include <boost/array.hpp>
-#include <stdio.h>
 %}
 
 %typemap(gotype) boost::array<char, 32>, boost::array<char, 64>, boost::array<char, 32>*, boost::array<char, 64>*  "[]byte"

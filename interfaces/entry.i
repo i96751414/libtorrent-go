@@ -1,5 +1,4 @@
 %{
-#include <sstream>
 #include <libtorrent/bencode.hpp>
 #include <libtorrent/bdecode.hpp>
 %}
