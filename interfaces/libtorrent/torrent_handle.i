@@ -12,10 +12,21 @@
 
 %array_class(libtorrent::block_info, block_info_list);
 
+%extend libtorrent::torrent_handle {
+    const libtorrent::torrent_info* torrent_file() {
+        return $self->torrent_file().get();
+    }
+}
 %ignore libtorrent::torrent_handle::torrent_file;
-%ignore libtorrent::torrent_handle::use_interface;
 
+%extend libtorrent::partial_piece_info {
+    block_info_list* blocks() {
+        return block_info_list_frompointer($self->blocks);
+    }
+}
 %ignore libtorrent::partial_piece_info::blocks;
+
+%ignore libtorrent::torrent_handle::use_interface;
 %ignore libtorrent::hash_value;
 %ignore libtorrent::block_info::peer; // linux_arm
 %ignore libtorrent::block_info::set_peer; // linux_arm
@@ -39,14 +50,3 @@ namespace libtorrent {
 using libtorrent::queue_position_t;
 %}
 
-%extend libtorrent::torrent_handle {
-    const libtorrent::torrent_info* torrent_file() {
-        return $self->torrent_file().get();
-    }
-}
-
-%extend libtorrent::partial_piece_info {
-    block_info_list* blocks() {
-        return block_info_list_frompointer($self->blocks);
-    }
-}
