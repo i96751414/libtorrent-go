@@ -93,7 +93,7 @@ endif
 LIBTORRENT_CFLAGS = $(CFLAGS) $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --cflags libtorrent-rasterbar)
 LIBTORRENT_LDFLAGS = $(LDFLAGS) $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --static --libs libtorrent-rasterbar)
 DEFINE_IGNORES = __STDC__|_cdecl|__cdecl|_fastcall|__fastcall|_stdcall|__stdcall|__declspec
-CC_DEFINES = $(shell echo | $(CC) -dM -E - | grep -v -E "$(DEFINE_IGNORES)" | sed -E "s/\#define[[:space:]]+([a-zA-Z0-9_()]+)[[:space:]]+(.*)/-D\1="\2"/g" | tr '\n' ' ')
+CC_DEFINES = $(shell echo | $(CC) -dM -E - | grep -v -E "$(DEFINE_IGNORES)" | sed -E "s/\#define[[:space:]]+([a-zA-Z0-9_()]+)[[:space:]]+(.*)/-D\1=$"\2$"/g" | tr '\n' ' ')
 
 ifeq ($(TARGET_OS), windows)
 	CC_DEFINES += -DSWIGWIN
@@ -134,6 +134,13 @@ else
 	$(DOCKER) run --rm -v "$(GOPATH)":/go -v "$(shell pwd)":/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):$@ make re;
 endif
 
+debug:
+	$(DOCKER) run --rm -v "$(GOPATH)":/go -v "$(shell pwd)":/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):linux-x64 bash -c \
+	"rm -rf /go/src/$(GO_PACKAGE)/work; \
+	make re OPTS=-work; \
+	cp -r /tmp/go-build* /go/src/$(GO_PACKAGE)/work && \
+	chown -R $(shell id -u):$(shell id -g) /go/src/$(GO_PACKAGE)/work"
+
 build:
 	SWIG_FLAGS='$(CC_DEFINES) $(LIBTORRENT_CFLAGS)' \
 	CC=$(CC) CXX=$(CXX) \
@@ -141,7 +148,7 @@ build:
 	CGO_ENABLED=1 \
 	GOOS=$(GOOS) GOARCH=$(GOARCH) GOARM=$(GOARM) \
 	PATH=.:$$PATH \
-	go install -v -ldflags '$(GO_LDFLAGS)' -x $(PKGDIR)
+	go install $(OPTS) -v -ldflags '$(GO_LDFLAGS)' -x $(PKGDIR)
 
 clean:
 	rm -rf "$(OUT_LIBRARY)"

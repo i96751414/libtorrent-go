@@ -4,6 +4,7 @@
 
 namespace libtorrent {
     struct picker_flags_tag;
+    // %template(picker_flags_t) flags::bitfield_flag<std::uint32_t, picker_flags_tag>;
 }
 
 %ignore libtorrent::torrent_alert::torrent_alert;

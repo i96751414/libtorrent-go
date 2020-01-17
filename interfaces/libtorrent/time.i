@@ -3,7 +3,7 @@
 %}
 %include "libtorrent/time.hpp"
 
-// Swig seems not to be handling 'using' keyword
+// Swig seems not to be handling 'using' keyword in some cases
 /*%{
 using libtorrent::time_point;
 %}*/

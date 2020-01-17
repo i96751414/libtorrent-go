@@ -4,6 +4,7 @@
 
 namespace libtorrent {
     struct file_flags_tag;
+    // %template(file_flags_t) flags::bitfield_flag<std::uint8_t, file_flags_tag>;
 }
 
 %ignore libtorrent::internal_file_entry;
