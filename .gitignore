@@ -21,3 +21,6 @@ _cgo_export.*
 _testmain.go
 
 *.exe
+
+# SWIG defines - automatically generated
+interfaces/defines.i

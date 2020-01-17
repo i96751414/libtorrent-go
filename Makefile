@@ -116,7 +116,16 @@ endif
 ifeq ($(GOPATH),)
 	GOPATH = $(shell go env GOPATH)
 endif
+ifeq ($(USERGRP),)
+	USERGRP = "$(shell id -u):$(shell id -g)"
+endif
 
+DOCKER_GOPATH = "/go"
+DOCKER_WORKDIR = "$(DOCKER_GOPATH)/src/$(GO_PACKAGE)"
+
+WORKDIR = "$(GOPATH)/src/$(GO_PACKAGE)"
+DEFINES = $(WORKDIR)/interfaces/defines.i
+WORK = $(WORKDIR)/work
 OUT_PATH = "$(GOPATH)/pkg/$(GOOS)_$(GOARCH)$(PATH_SUFFIX)"
 OUT_LIBRARY = "$(OUT_PATH)/$(GO_PACKAGE).a"
 
@@ -131,17 +140,33 @@ $(PLATFORMS):
 ifeq ($@, all)
 	$(MAKE) all
 else
-	$(DOCKER) run --rm -v "$(GOPATH)":/go -v "$(shell pwd)":/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):$@ make re;
+	$(DOCKER) run --rm \
+	-v "$(GOPATH)":$(DOCKER_GOPATH) \
+	-v "$(shell pwd)":$(DOCKER_WORKDIR) \
+	-w $(DOCKER_WORKDIR) \
+	-e USERGRP=$(USERGRP) \
+	-e GOPATH=$(DOCKER_GOPATH) \
+	$(DOCKER_IMAGE):$@ make re;
 endif
 
 debug:
-	$(DOCKER) run --rm -v "$(GOPATH)":/go -v "$(shell pwd)":/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):linux-x64 bash -c \
-	"rm -rf /go/src/$(GO_PACKAGE)/work; \
-	make re OPTS=-work; \
-	cp -r /tmp/go-build* /go/src/$(GO_PACKAGE)/work && \
-	chown -R $(shell id -u):$(shell id -g) /go/src/$(GO_PACKAGE)/work"
+	$(DOCKER) run --rm \
+	-v "$(GOPATH)":$(DOCKER_GOPATH) \
+	-v "$(shell pwd)":$(DOCKER_WORKDIR) \
+	-w $(DOCKER_WORKDIR) \
+	-e USERGRP=$(USERGRP) \
+	-e GOPATH=$(DOCKER_GOPATH) \
+	$(DOCKER_IMAGE):linux-x64 bash -c \
+	'make re OPTS=-work; \
+	cp -r /tmp/go-build* $(DOCKER_WORKDIR)/work && \
+	chown -R $$USERGRP $(DOCKER_WORKDIR)/work'
+
+defines:
+	$(shell $(CC) -dM -E - </dev/null | grep -E "__WORDSIZE|__x86_64|__x86_64__" | sed -E 's/#define[[:space:]]+([a-zA-Z0-9_()]+)(.*)/#ifndef \1\n#define \1\2\n#endif/g' > $(DEFINES))
+	chown $(USERGRP) $(DEFINES)
 
 build:
+	# TODO: Remove SWIG_FLAGS (it seems to have no effect) and use defines instead
 	SWIG_FLAGS='$(CC_DEFINES) $(LIBTORRENT_CFLAGS)' \
 	CC=$(CC) CXX=$(CXX) \
 	PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) \
@@ -151,9 +176,9 @@ build:
 	go install $(OPTS) -v -ldflags '$(GO_LDFLAGS)' -x $(PKGDIR)
 
 clean:
-	rm -rf "$(OUT_LIBRARY)"
+	rm -rf $(OUT_LIBRARY) $(DEFINES) $(WORK)
 
-re: clean build
+re: clean defines build
 
 env:
 	$(DOCKER) build \
@@ -196,4 +221,9 @@ runtest:
 	cd test; go run -x test.go; cd ..
 
 retest:
-	$(DOCKER) run --rm -v "$(GOPATH)":/go -v "$(shell pwd)":/go/src/$(GO_PACKAGE) -w /go/src/$(GO_PACKAGE) -e GOPATH=/go $(DOCKER_IMAGE):linux-x64 make runtest;
+	$(DOCKER) run --rm \
+	-v "$(GOPATH)":$(DOCKER_GOPATH) \
+	-v "$(shell pwd)":$(DOCKER_WORKDIR) \
+	-w $(DOCKER_WORKDIR) \
+	-e GOPATH=$(DOCKER_GOPATH) \
+	$(DOCKER_IMAGE):linux-x64 make runtest;

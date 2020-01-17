@@ -16,6 +16,9 @@
 #pragma SWIG nowarn=516 // Overloaded method ... ignored, using ... instead.
 #pragma SWIG nowarn=890 // Ignoring '...' due to Go name ('...') conflict with '...'
 
+// Automatically generated defines
+%include "interfaces/defines.i"
+
 // Helpers
 %include <stl.i>
 %include <stdint.i>
