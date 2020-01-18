@@ -14,13 +14,4 @@
 %ignore libtorrent::session_handle::async_add_torrent(add_torrent_params&&);
 %ignore libtorrent::session_handle::apply_settings(settings_pack&&);
 
-%extend libtorrent::session_handle {
-    std::vector<libtorrent::alert*> pop_alerts() {
-        std::vector<libtorrent::alert*> alerts;
-        $self->pop_alerts(&alerts);
-        return alerts;
-    }
-}
-%ignore libtorrent::session_handle::pop_alerts;
-
 %include "libtorrent/session_handle.hpp"
