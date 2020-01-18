@@ -24,3 +24,6 @@ _testmain.go
 
 # SWIG defines - automatically generated
 interfaces/defines.i
+
+# For debugging
+work
