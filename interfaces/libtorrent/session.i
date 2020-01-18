@@ -17,10 +17,6 @@
 %include "libtorrent/session.hpp"
 
 %extend libtorrent::session {
-    libtorrent::session_handle* get_handle() {
-        return $self;
-    }
-
     void add_extensions() {
         $self->add_extension(&libtorrent::create_smart_ban_plugin);
         $self->add_extension(&libtorrent::create_ut_metadata_plugin);
