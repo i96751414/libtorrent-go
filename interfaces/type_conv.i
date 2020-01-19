@@ -10,13 +10,19 @@
 TYPE_INTEGRAL_CONVERSION(%arg(libtorrent::flags::bitfield_flag<underlying_type, libtorrent::name ## ag>), underlying_type, go_type)
 %enddef
 
-%define TYPE_DURATION_CONVERSION(name)
+%define TYPE_TIME_DURATION_CONVERSION(name)
 %typemap(gotype) name  "time.Duration"
 %typemap(imtype) name  "int64"
 %typemap(in) name      %{    $1 = std::chrono::nanoseconds($input);%}
 %typemap(goin) name    %{    $result = int64($input)%}
 %typemap(out) name     %{    $result = std::chrono::duration_cast<std::chrono::nanoseconds>($1).count();%}
 %typemap(goout) name   %{    $result = time.Duration($1)%}
+%enddef
+
+%define TYPE_DURATION_CONVERSION(name, go_type)
+%typemap(gotype) name  "go_type"
+%typemap(in) name      %{    $1 = name($input);%}
+%typemap(out) name     %{    $result = $1.count();%}
 %enddef
 
 %define TYPE_STRING_VIEW_CONVERSION(name)
@@ -35,7 +41,15 @@ TYPE_STRING_VIEW_CONVERSION(libtorrent::string_view)
 
 // time
 %go_import("time")
-TYPE_DURATION_CONVERSION(libtorrent::time_duration)
+TYPE_TIME_DURATION_CONVERSION(libtorrent::time_duration)
+TYPE_DURATION_CONVERSION(libtorrent::seconds, int64)
+TYPE_DURATION_CONVERSION(libtorrent::milliseconds, int64)
+TYPE_DURATION_CONVERSION(libtorrent::microseconds, int64)
+TYPE_DURATION_CONVERSION(libtorrent::minutes, int64)
+TYPE_DURATION_CONVERSION(libtorrent::hours, int64)
+
+TYPE_DURATION_CONVERSION(libtorrent::seconds32, int)
+TYPE_DURATION_CONVERSION(libtorrent::minutes32, int)
 
 // units
 TYPE_INTEGRAL_CONVERSION(piece_index_t, std::int32_t, int)
