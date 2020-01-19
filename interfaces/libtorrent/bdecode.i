@@ -4,8 +4,6 @@
 
 %ignore libtorrent::bdecode_node::bdecode_node(bdecode_node&&);
 
-%include "libtorrent/bdecode.hpp"
-
 %inline %{
 namespace libtorrent {
     error_code bdecode(std::string data, bdecode_node& ret) {
@@ -15,3 +13,6 @@ namespace libtorrent {
     }
 }
 %}
+%ignore libtorrent::bdecode;
+
+%include "libtorrent/bdecode.hpp"
