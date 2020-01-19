@@ -1,9 +1,9 @@
 #define %arg(A...) A
 
 %define TYPE_INTEGRAL_CONVERSION(name, underlying_type, go_type)
-%typemap(gotype) name, const name&  "go_type"
-%typemap(in) name                   %{    $1 = name(static_cast<underlying_type>($input));%}
-%typemap(out) name                  %{    $result = static_cast<underlying_type>((name) $1);%}
+%typemap(gotype) name  "go_type"
+%typemap(in) name      %{    $1 = name(static_cast<underlying_type>($input));%}
+%typemap(out) name     %{    $result = static_cast<underlying_type>((name) $1);%}
 %enddef
 
 %define LIBTORRENT_BITFIELD_CONVERSION(name, underlying_type, go_type)
@@ -11,13 +11,27 @@ TYPE_INTEGRAL_CONVERSION(%arg(libtorrent::flags::bitfield_flag<underlying_type, 
 %enddef
 
 %define TYPE_DURATION_CONVERSION(name)
-%typemap(gotype) name, const name&  "time.Duration"
-%typemap(imtype) name, const name&  "int64"
-%typemap(in) name                   %{    $1 = std::chrono::nanoseconds($input);%}
-%typemap(goin) name, const name&    %{    $result = int64($input)%}
-%typemap(out) name                  %{    $result = std::chrono::duration_cast<std::chrono::nanoseconds>($1).count();%}
-%typemap(goout) name, const name&   %{    $result = time.Duration($1)%}
+%typemap(gotype) name  "time.Duration"
+%typemap(imtype) name  "int64"
+%typemap(in) name      %{    $1 = std::chrono::nanoseconds($input);%}
+%typemap(goin) name    %{    $result = int64($input)%}
+%typemap(out) name     %{    $result = std::chrono::duration_cast<std::chrono::nanoseconds>($1).count();%}
+%typemap(goout) name   %{    $result = time.Duration($1)%}
 %enddef
+
+%define TYPE_STRING_VIEW_CONVERSION(name)
+%typemap(gotype) name  "string"
+%typemap(in) name                           %{    $1 = {$input.p, (name::size_type) $input.n};%}
+%typemap(out) name                          %{    $result = Swig_AllocateString($1.data(), $1.length());%}
+%typemap(goout,fragment="CopyString") name  %{    $result = swigCopyString($1)%}
+
+%typemap(gotype) name::size_type  "int64"
+%typemap(in) name::size_type                %{    $1 = (name::size_type) $input;%}
+%typemap(out) name::size_type               %{    $result = $1;%}
+%enddef
+
+// string_view
+TYPE_STRING_VIEW_CONVERSION(libtorrent::string_view)
 
 // time
 %go_import("time")
