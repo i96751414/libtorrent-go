@@ -15,7 +15,7 @@ TYPE_INTEGRAL_CONVERSION(%arg(libtorrent::flags::bitfield_flag<underlying_type, 
 %typemap(imtype) name, const name&  "int64"
 %typemap(in) name                   %{    $1 = std::chrono::nanoseconds($input);%}
 %typemap(goin) name, const name&    %{    $result = int64($input)%}
-%typemap(out, optimal="1") name     %{    $result = std::chrono::duration_cast<std::chrono::nanoseconds>($1).count();%}
+%typemap(out) name                  %{    $result = std::chrono::duration_cast<std::chrono::nanoseconds>($1).count();%}
 %typemap(goout) name, const name&   %{    $result = time.Duration($1)%}
 %enddef
 
