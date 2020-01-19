@@ -150,6 +150,7 @@ namespace libtorrent {
 %include "interfaces/libtorrent/span.i"
 %include "interfaces/libtorrent/sha1_hash.i"
 %include "interfaces/libtorrent/bdecode.i"
+%include "interfaces/libtorrent/bencode.i"
 %include "interfaces/libtorrent/entry.i"
 %include "interfaces/libtorrent/peer_id.i"
 %include "interfaces/libtorrent/peer_request.i"
