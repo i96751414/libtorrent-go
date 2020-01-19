@@ -1,6 +1,7 @@
 %{
 #include "libtorrent/bdecode.hpp"
 %}
+%include "libtorrent/bdecode.hpp"
 
 %inline %{
 namespace libtorrent {
