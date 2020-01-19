@@ -1,21 +1,27 @@
 #define %arg(A...) A
 
 %define TYPE_INTEGRAL_CONVERSION(name, underlying_type, go_type)
-%typemap(gotype) name, const name& "go_type"
-
-%typemap(in) name {
-    $1 = name(static_cast<underlying_type>($input));
-}
-%typemap(out) name {
-    $result = static_cast<underlying_type>((name) $1);
-}
-%typemap(goin) name, const name& ""
-%typemap(goout) name, const name& ""
+%typemap(gotype) name, const name&  "go_type"
+%typemap(in) name                   %{    $1 = name(static_cast<underlying_type>($input));%}
+%typemap(out) name                  %{    $result = static_cast<underlying_type>((name) $1);%}
 %enddef
 
 %define LIBTORRENT_BITFIELD_CONVERSION(name, underlying_type, go_type)
 TYPE_INTEGRAL_CONVERSION(%arg(libtorrent::flags::bitfield_flag<underlying_type, libtorrent::name ## ag>), underlying_type, go_type)
 %enddef
+
+%define TYPE_DURATION_CONVERSION(name)
+%typemap(gotype) name, const name&  "time.Duration"
+%typemap(imtype) name, const name&  "int64"
+%typemap(in) name                   %{    $1 = std::chrono::nanoseconds($input);%}
+%typemap(goin) name, const name&    %{    $result = int64($input)%}
+%typemap(out, optimal="1") name     %{    $result = std::chrono::duration_cast<std::chrono::nanoseconds>($1).count();%}
+%typemap(goout) name, const name&   %{    $result = time.Duration($1)%}
+%enddef
+
+// time
+%go_import("time")
+TYPE_DURATION_CONVERSION(libtorrent::time_duration)
 
 // units
 TYPE_INTEGRAL_CONVERSION(piece_index_t, std::int32_t, int)
