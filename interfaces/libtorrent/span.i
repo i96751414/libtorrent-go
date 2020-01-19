@@ -27,5 +27,7 @@ namespace libtorrent {
         }
     };
 
-    %template(int64_span) span<std::int64_t const>;
+    %template(char_span) span<char>;
+    %template(char_const_span) span<char const>;
+    %template(int64_const_span) span<std::int64_t const>;
 }
