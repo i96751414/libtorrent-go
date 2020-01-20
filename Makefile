@@ -42,6 +42,22 @@ GOLANG_BOOTSTRAP_SHA256 = 49f806f66762077861b7de7081f586995940772d29d4c45068c134
 
 LIBTORRENT_VERSION = RC_1_2
 
+ifeq ($(GOPATH),)
+	GOPATH = $(shell go env GOPATH)
+endif
+ifeq ($(USERGRP),)
+	USERGRP = "$(shell id -u):$(shell id -g)"
+endif
+
+DOCKER_GOPATH = "/go"
+DOCKER_WORKDIR = "$(DOCKER_GOPATH)/src/$(GO_PACKAGE)"
+
+WORKDIR = "$(GOPATH)/src/$(GO_PACKAGE)"
+DEFINES = $(WORKDIR)/interfaces/defines.i
+WORK = $(WORKDIR)/work
+OUT_PATH = "$(GOPATH)/pkg/$(GOOS)_$(GOARCH)$(PATH_SUFFIX)"
+OUT_LIBRARY = "$(OUT_PATH)/$(GO_PACKAGE).a"
+
 include platform_host.mk
 
 ifneq ($(CROSS_TRIPLE),)
@@ -62,7 +78,7 @@ else ifeq ($(TARGET_ARCH), armv7)
 	GOARCH = arm
 	GOARM = 7
 	PATH_SUFFIX = v7
-	PKGDIR = -pkgdir /go/pkg/linux_armv7
+	PKGDIR = -pkgdir $(GOPATH)/pkg/linux_armv7
 else ifeq ($(TARGET_ARCH), arm64)
 	GOARCH = arm64
 	GOARM =
@@ -112,22 +128,6 @@ else ifeq ($(TARGET_OS), android)
 	GO_LDFLAGS += -flto
 endif
 
-
-ifeq ($(GOPATH),)
-	GOPATH = $(shell go env GOPATH)
-endif
-ifeq ($(USERGRP),)
-	USERGRP = "$(shell id -u):$(shell id -g)"
-endif
-
-DOCKER_GOPATH = "/go"
-DOCKER_WORKDIR = "$(DOCKER_GOPATH)/src/$(GO_PACKAGE)"
-
-WORKDIR = "$(GOPATH)/src/$(GO_PACKAGE)"
-DEFINES = $(WORKDIR)/interfaces/defines.i
-WORK = $(WORKDIR)/work
-OUT_PATH = "$(GOPATH)/pkg/$(GOOS)_$(GOARCH)$(PATH_SUFFIX)"
-OUT_LIBRARY = "$(OUT_PATH)/$(GO_PACKAGE).a"
 
 .PHONY: $(PLATFORMS)
 
