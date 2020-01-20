@@ -8,9 +8,14 @@
 %typemap(out) name*    %{    $result = static_cast<underlying_type>((name) *$1);%}
 %enddef
 
-%define LIBTORRENT_BITFIELD_CONVERSION(name, underlying_type, go_type)
-TYPE_INTEGRAL_CONVERSION(%arg(libtorrent::flags::bitfield_flag<underlying_type, libtorrent::name ## ag>), underlying_type, go_type)
+%define LIBTORRENT_BITFIELD_CONVERSION(tag, underlying_type, go_type)
+TYPE_INTEGRAL_CONVERSION(%arg(libtorrent::flags::bitfield_flag<underlying_type, tag>), underlying_type, go_type)
 %enddef
+
+%define LIBTORRENT_STRONG_TYPEDEF_CONVERSION(tag, underlying_type, go_type)
+TYPE_INTEGRAL_CONVERSION(%arg(libtorrent::aux::strong_typedef<underlying_type, tag>), underlying_type, go_type)
+%enddef
+
 
 %define TYPE_TIME_DURATION_CONVERSION(name)
 %typemap(gotype) name  "time.Duration"
@@ -54,52 +59,52 @@ TYPE_DURATION_CONVERSION(libtorrent::seconds32, int)
 TYPE_DURATION_CONVERSION(libtorrent::minutes32, int)
 
 // units
-TYPE_INTEGRAL_CONVERSION(piece_index_t, std::int32_t, int)
-TYPE_INTEGRAL_CONVERSION(file_index_t, std::int32_t, int)
+LIBTORRENT_STRONG_TYPEDEF_CONVERSION(libtorrent::aux::piece_index_tag, std::int32_t, int)
+LIBTORRENT_STRONG_TYPEDEF_CONVERSION(libtorrent::aux::file_index_tag, std::int32_t, int)
 
 // torrent_handle
-LIBTORRENT_BITFIELD_CONVERSION(status_flags_t, std::uint32_t, uint)
-LIBTORRENT_BITFIELD_CONVERSION(add_piece_flags_t, std::uint8_t, uint)
-LIBTORRENT_BITFIELD_CONVERSION(pause_flags_t, std::uint8_t, uint)
-LIBTORRENT_BITFIELD_CONVERSION(deadline_flags_t, std::uint8_t, uint)
-LIBTORRENT_BITFIELD_CONVERSION(resume_data_flags_t, std::uint8_t, uint)
-LIBTORRENT_BITFIELD_CONVERSION(reannounce_flags_t, std::uint8_t, uint)
-TYPE_INTEGRAL_CONVERSION(queue_position_t, int, int)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::status_flags_tag, std::uint32_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::add_piece_flags_tag, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::pause_flags_tag, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::deadline_flags_tag, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::resume_data_flags_tag, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::reannounce_flags_tag, std::uint8_t, uint)
+LIBTORRENT_STRONG_TYPEDEF_CONVERSION(libtorrent::queue_position_tag, int, int)
 
 // peer_class
-TYPE_INTEGRAL_CONVERSION(peer_class_t, std::uint32_t, uint)
+LIBTORRENT_STRONG_TYPEDEF_CONVERSION(libtorrent::peer_class_tag, std::uint32_t, uint)
 
 // portmap
-TYPE_INTEGRAL_CONVERSION(port_mapping_t, int, int)
+LIBTORRENT_STRONG_TYPEDEF_CONVERSION(libtorrent::port_mapping_tag, int, int)
 
 // peer_info
-LIBTORRENT_BITFIELD_CONVERSION(peer_flags_t, std::uint32_t, uint)
-LIBTORRENT_BITFIELD_CONVERSION(peer_source_flags_t, std::uint8_t, uint)
-LIBTORRENT_BITFIELD_CONVERSION(bandwidth_state_flags_t, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::peer_flags_tag, std::uint32_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::peer_source_flags_tag, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::bandwidth_state_flags_tag, std::uint8_t, uint)
 
 // download_priority
-TYPE_INTEGRAL_CONVERSION(download_priority_t, std::uint8_t, uint)
+LIBTORRENT_STRONG_TYPEDEF_CONVERSION(libtorrent::download_priority_tag, std::uint8_t, uint)
 
 // alert
-LIBTORRENT_BITFIELD_CONVERSION(alert_category_t, std::uint32_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::alert_category_tag, std::uint32_t, uint)
 
 // torrent_flags
-LIBTORRENT_BITFIELD_CONVERSION(torrent_flags_t, std::uint64_t, uint64)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::torrent_flags_tag, std::uint64_t, uint64)
 
 // session_types
-LIBTORRENT_BITFIELD_CONVERSION(save_state_flags_t, std::uint32_t, uint)
-LIBTORRENT_BITFIELD_CONVERSION(session_flags_t, std::uint8_t, uint)
-LIBTORRENT_BITFIELD_CONVERSION(remove_flags_t, std::uint8_t, uint)
-LIBTORRENT_BITFIELD_CONVERSION(reopen_network_flags_t, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::save_state_flags_tag, std::uint32_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::session_flags_tag, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::remove_flags_tag, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::reopen_network_flags_tag, std::uint8_t, uint)
 
 // alert_types
-LIBTORRENT_BITFIELD_CONVERSION(picker_flags_t, std::uint32_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::picker_flags_tag, std::uint32_t, uint)
 
 // create_torrent
-LIBTORRENT_BITFIELD_CONVERSION(create_flags_t, std::uint32_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::create_flags_tag, std::uint32_t, uint)
 
 // file_storage
-LIBTORRENT_BITFIELD_CONVERSION(file_flags_t, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::file_flags_tag, std::uint8_t, uint)
 
 // pex_flags
-LIBTORRENT_BITFIELD_CONVERSION(pex_flags_t, std::uint8_t, uint)
+LIBTORRENT_BITFIELD_CONVERSION(libtorrent::pex_flags_tag, std::uint8_t, uint)
