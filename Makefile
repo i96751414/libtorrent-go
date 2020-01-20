@@ -43,9 +43,6 @@ LIBTORRENT_VERSION = RC_1_2
 ifeq ($(GOPATH),)
 	GOPATH = $(shell go env GOPATH)
 endif
-ifeq ($(USERGRP),)
-	USERGRP = "$(shell id -u):$(shell id -g)"
-endif
 
 include platform_host.mk
 
@@ -119,6 +116,7 @@ endif
 
 DOCKER_GOPATH = "/go"
 DOCKER_WORKDIR = "$(DOCKER_GOPATH)/src/$(GO_PACKAGE)"
+DOCKER_GOCACHE = "/tmp/.cache"
 
 WORKDIR = "$(GOPATH)/src/$(GO_PACKAGE)"
 DEFINES = $(WORKDIR)/interfaces/defines.i
@@ -126,6 +124,7 @@ WORK = $(WORKDIR)/work
 OUT_PATH = "$(GOPATH)/pkg/$(GOOS)_$(GOARCH)$(PATH_SUFFIX)"
 OUT_LIBRARY = "$(OUT_PATH)/$(GO_PACKAGE).a"
 
+USERGRP = "$(shell id -u):$(shell id -g)"
 
 .PHONY: $(PLATFORMS)
 
@@ -139,29 +138,29 @@ ifeq ($@, all)
 	$(MAKE) all
 else
 	$(DOCKER) run --rm \
+	-u $(USERGRP) \
 	-v "$(GOPATH)":$(DOCKER_GOPATH) \
 	-v "$(shell pwd)":$(DOCKER_WORKDIR) \
 	-w $(DOCKER_WORKDIR) \
-	-e USERGRP=$(USERGRP) \
+	-e GOCACHE=$(DOCKER_GOCACHE) \
 	-e GOPATH=$(DOCKER_GOPATH) \
 	$(DOCKER_IMAGE):$@ make re;
 endif
 
 debug:
 	$(DOCKER) run --rm \
+	-u $(USERGRP) \
 	-v "$(GOPATH)":$(DOCKER_GOPATH) \
 	-v "$(shell pwd)":$(DOCKER_WORKDIR) \
 	-w $(DOCKER_WORKDIR) \
-	-e USERGRP=$(USERGRP) \
+	-e GOCACHE=$(DOCKER_GOCACHE) \
 	-e GOPATH=$(DOCKER_GOPATH) \
 	$(DOCKER_IMAGE):linux-x64 bash -c \
 	'make re OPTS=-work; \
-	cp -r /tmp/go-build* $(DOCKER_WORKDIR)/work && \
-	chown -R $$USERGRP $(DOCKER_WORKDIR)/work'
+	cp -rf /tmp/go-build* $(DOCKER_WORKDIR)/work'
 
 defines:
 	$(shell $(CC) -dM -E - </dev/null | grep -E "__WORDSIZE|__x86_64|__x86_64__" | sed -E 's/#define[[:space:]]+([a-zA-Z0-9_()]+)(.*)/#ifndef \1\n#define \1\2\n#endif/g' > $(DEFINES))
-	chown $(USERGRP) $(DEFINES)
 
 build:
 	# TODO: Remove SWIG_FLAGS (it seems to have no effect) and use defines instead
