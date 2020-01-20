@@ -1,9 +1,11 @@
 #define %arg(A...) A
 
 %define TYPE_INTEGRAL_CONVERSION(name, underlying_type, go_type)
-%typemap(gotype) name  "go_type"
+%typemap(gotype) name, name* "go_type"
 %typemap(in) name      %{    $1 = name(static_cast<underlying_type>($input));%}
+%typemap(in) name*     %{    auto tmp = name(static_cast<underlying_type>($input)); $1 = &tmp;%}
 %typemap(out) name     %{    $result = static_cast<underlying_type>((name) $1);%}
+%typemap(out) name*    %{    $result = static_cast<underlying_type>((name) *$1);%}
 %enddef
 
 %define LIBTORRENT_BITFIELD_CONVERSION(name, underlying_type, go_type)
