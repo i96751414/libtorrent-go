@@ -1,4 +1,4 @@
-libtorrent-go
+libtorrent-go [![Build Status](https://travis-ci.org/i96751414/libtorrent-go.svg?branch=master)](https://travis-ci.org/i96751414/libtorrent-go)
 =============
 
 SWIG Go bindings for [libtorrent-rasterbar](https://github.com/arvidn/libtorrent)

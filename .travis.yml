@@ -1,7 +1,7 @@
 sudo: required
 language: go
 go:
-  - "1.11"
+  - "1.13"
 
 env:
   - PLATFORM=android-arm
@@ -27,6 +27,7 @@ install:
   - make env
 
 script:
+  - set -e
   - make $PLATFORM
   - |
     if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then
