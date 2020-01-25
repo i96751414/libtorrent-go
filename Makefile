@@ -92,11 +92,6 @@ ifneq ($(CROSS_ROOT),)
 	PKG_CONFIG_PATH = $(CROSS_ROOT)/lib/pkgconfig
 endif
 
-LIBTORRENT_CFLAGS = $(CFLAGS) $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --cflags libtorrent-rasterbar)
-LIBTORRENT_LDFLAGS = $(LDFLAGS) $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) $(PKG_CONFIG) --static --libs libtorrent-rasterbar)
-DEFINE_IGNORES = __STDC__|_cdecl|__cdecl|_fastcall|__fastcall|_stdcall|__stdcall|__declspec
-CC_DEFINES = $(shell echo | $(CC) -dM -E - | grep -v -E "$(DEFINE_IGNORES)" | sed -E "s/\#define[[:space:]]+([a-zA-Z0-9_()]+)[[:space:]]+(.*)/-D\1=$"\2$"/g" | tr '\n' ' ')
-
 ifeq ($(TARGET_OS), windows)
 	CC_DEFINES += -DSWIGWIN
 	CC_DEFINES += -D_WIN32_WINNT=0x0600
@@ -112,6 +107,9 @@ else ifeq ($(TARGET_OS), android)
 	CC = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang
 	CXX = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang++
 	GO_LDFLAGS += -flto
+	ifeq ($(TARGET_ARCH), arm64)
+		CC_DEFINES += -DSWIGWORDSIZE64
+	endif
 endif
 
 DOCKER_GOPATH = "/go"
@@ -164,11 +162,12 @@ else
 endif
 
 defines:
-	$(shell $(CC) -dM -E - </dev/null | grep -E "__WORDSIZE|__x86_64|__x86_64__" | sed -E 's/#define[[:space:]]+([a-zA-Z0-9_()]+)(.*)/#ifndef \1\n#define \1\2\n#endif/g' > $(DEFINES))
+	$(shell ( \
+	echo $(CC_DEFINES) | sed -E 's/-D([a-zA-Z0-9_()]+)=?/\n#define \1 /g' && \
+	$(CC) -dM -E - </dev/null | grep -E "__WORDSIZE|__x86_64|__x86_64__" | sed -E 's/#define[[:space:]]+([a-zA-Z0-9_()]+)(.*)/#ifndef \1\n#define \1\2\n#endif/g' \
+	) > $(DEFINES))
 
 build:
-	# TODO: Remove SWIG_FLAGS (it seems to have no effect) and use defines instead
-	SWIG_FLAGS='$(CC_DEFINES) $(LIBTORRENT_CFLAGS)' \
 	CC=$(CC) CXX=$(CXX) \
 	PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) \
 	CGO_ENABLED=1 \
