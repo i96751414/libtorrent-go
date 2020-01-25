@@ -148,6 +148,9 @@ else
 endif
 
 debug:
+ifeq ($(PLATFORM),)
+	$(MAKE) debug PLATFORM=linux-x64
+else
 	$(DOCKER) run --rm \
 	-u $(USERGRP) \
 	-v "$(GOPATH)":$(DOCKER_GOPATH) \
@@ -155,9 +158,10 @@ debug:
 	-w $(DOCKER_WORKDIR) \
 	-e GOCACHE=$(DOCKER_GOCACHE) \
 	-e GOPATH=$(DOCKER_GOPATH) \
-	$(DOCKER_IMAGE):linux-x64 bash -c \
+	$(DOCKER_IMAGE):$(PLATFORM) bash -c \
 	'make re OPTS=-work; \
 	cp -rf /tmp/go-build* $(DOCKER_WORKDIR)/work'
+endif
 
 defines:
 	$(shell $(CC) -dM -E - </dev/null | grep -E "__WORDSIZE|__x86_64|__x86_64__" | sed -E 's/#define[[:space:]]+([a-zA-Z0-9_()]+)(.*)/#ifndef \1\n#define \1\2\n#endif/g' > $(DEFINES))
@@ -199,6 +203,11 @@ env:
 envs:
 	for i in $(PLATFORMS); do \
 		$(MAKE) env PLATFORM=$$i; \
+	done
+
+pull-all:
+	for i in $(PLATFORMS); do \
+		$(MAKE) pull PLATFORM=$$i; \
 	done
 
 pull:
