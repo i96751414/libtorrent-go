@@ -71,8 +71,8 @@ removeReduntantParentheses \
   "announce_entry.hpp" \
   "bandwidth_limit.hpp"
 
-removeNoreturn \
-  "torrent_handle.hpp"
+#removeNoreturn \
+#  "torrent_handle.hpp"
 
 replaceStructDefaultArgument \
   "file.hpp"

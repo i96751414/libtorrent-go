@@ -31,6 +31,7 @@
 #define BOOST_POSIX_API
 #define BOOST_NO_TYPEID
 #define BOOST_SYSTEM_CONSTEXPR
+#define BOOST_NO_EXCEPTIONS
 #define TORRENT_NO_DEPRECATE
 
 namespace std {
@@ -84,10 +85,6 @@ namespace std {
 %}
 
 // Boost stuff
-%{
-#include <boost/asio/error.hpp>
-%}
-
 %include <boost/preprocessor/cat.hpp>
 %include <boost/version.hpp>
 %include <boost/config/detail/suffix.hpp>
