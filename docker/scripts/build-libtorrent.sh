@@ -18,7 +18,7 @@ sed -i 's/$PKG_CONFIG openssl --libs-only-/$PKG_CONFIG openssl --static --libs-o
 if [ -v LT_OSXCROSS ]; then
   export OSXCROSS_PKG_CONFIG_PATH=${CROSS_ROOT}/lib/pkgconfig/
 fi
-# shellcheck disable=SC2097,SC2098
+# shellcheck disable=SC2097,SC2098,SC2086
 CC=${LT_CC} CXX=${LT_CXX} \
   CFLAGS="${CFLAGS} -O2 ${LT_FLAGS}" \
   CXXFLAGS="${CXXFLAGS} ${LT_CXXFLAGS} ${CFLAGS}" \
@@ -29,6 +29,6 @@ CC=${LT_CC} CXX=${LT_CXX} \
   --disable-deprecated-functions \
   --host="${CROSS_TRIPLE}" \
   --prefix="${CROSS_ROOT}" \
-  --with-boost="${CROSS_ROOT}" --with-boost-libdir="${CROSS_ROOT}/lib" "${LT_OPTS}"
+  --with-boost="${CROSS_ROOT}" --with-boost-libdir="${CROSS_ROOT}/lib" ${LT_OPTS}
 make -j "$(grep -c processor </proc/cpuinfo)" && make install
 rm -rf "$(pwd)"

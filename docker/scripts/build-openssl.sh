@@ -8,7 +8,8 @@ echo "$OPENSSL_SHA256  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c -
 tar -xzf "openssl-${OPENSSL_VERSION}.tar.gz"
 rm "openssl-${OPENSSL_VERSION}.tar.gz"
 cd "openssl-${OPENSSL_VERSION}"
-CROSS_COMPILE="${CROSS_TRIPLE}-" ./Configure threads no-shared "${OPENSSL_OPTS}" --prefix="${CROSS_ROOT}" 1>log 2>err
+# shellcheck disable=SC2086
+CROSS_COMPILE="${CROSS_TRIPLE}-" ./Configure threads no-shared ${OPENSSL_OPTS} --prefix="${CROSS_ROOT}" 1>log 2>err
 make -j "$(grep -c processor </proc/cpuinfo)" 1>log 2>err
 make install 1>log 2>err
 rm -rf "$(pwd)"
