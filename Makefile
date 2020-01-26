@@ -98,6 +98,10 @@ ifeq ($(TARGET_OS), windows)
 	ifeq ($(TARGET_ARCH), x64)
 		CC_DEFINES += -DSWIGWORDSIZE32
 	endif
+else ifeq ($(TARGET_OS), linux)
+	ifeq ($(TARGET_ARCH), arm64)
+		CC_DEFINES += -DSWIGWORDSIZE64
+	endif
 else ifeq ($(TARGET_OS), darwin)
 	CC = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang
 	CXX = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang++
