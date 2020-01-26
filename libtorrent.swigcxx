@@ -19,6 +19,9 @@
 // Automatically generated defines
 %include "interfaces/defines.i"
 
+// Our custom types for stdint
+%include "interfaces/stdint.i"
+
 // Helpers
 %include <stl.i>
 %include <stdint.i>
