@@ -7,6 +7,6 @@ package libtorrent
 // #cgo darwin LDFLAGS: -lm -lstdc++ -framework CoreFoundation -framework SystemConfiguration
 // #cgo linux CXXFLAGS: -std=c++11 -I/usr/include/libtorrent -Wno-deprecated-declarations
 // #cgo linux LDFLAGS: -lm -lstdc++ -ldl -lrt
-// #cgo windows CXXFLAGS: -DIPV6_TCLASS=39 -DSWIGWIN -D_WIN32_WINNT=0x0600 -D__MINGW32__
+// #cgo windows CXXFLAGS: -std=c++11 -DIPV6_TCLASS=39 -D_WIN32_WINNT=0x0600 -D__MINGW32__
 // #cgo windows LDFLAGS: -static-libgcc -static-libstdc++
 import "C"

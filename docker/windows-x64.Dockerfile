@@ -58,7 +58,7 @@ COPY scripts/update-includes.sh /build/
 COPY scripts/build-libtorrent.sh /build/
 ENV LT_CC ${CROSS_TRIPLE}-cc
 ENV LT_CXX ${CROSS_TRIPLE}-c++
-ENV LT_FLAGS -lmswsock -DUNICODE -D_UNICODE -DWIN32 -DWIN32_LEAN_AND_MEAN -DIPV6_TCLASS=39 -D_WIN32_WINNT=0x0600
+ENV LT_FLAGS -liphlpapi -lmswsock -DUNICODE -D_UNICODE -DWIN32 -DWIN32_LEAN_AND_MEAN -DIPV6_TCLASS=39 -D_WIN32_WINNT=0x0600
 ENV LT_CXXFLAGS -std=c++11
-ENV LT_LIBS -lmswsock
+ENV LT_LIBS -liphlpapi -lmswsock
 RUN ./build-libtorrent.sh
