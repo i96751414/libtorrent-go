@@ -57,4 +57,5 @@ COPY scripts/update-includes.sh /build/
 COPY scripts/build-libtorrent.sh /build/
 ENV LT_CC ${CROSS_TRIPLE}-gcc
 ENV LT_CXX ${CROSS_TRIPLE}-g++
+ENV LT_CXXFLAGS -std=c++11
 RUN ./build-libtorrent.sh
