@@ -30,5 +30,5 @@ CC=${LT_CC} CXX=${LT_CXX} \
   --host="${CROSS_TRIPLE}" \
   --prefix="${CROSS_ROOT}" \
   --with-boost="${CROSS_ROOT}" --with-boost-libdir="${CROSS_ROOT}/lib" ${LT_OPTS}
-make -j "$(grep -c processor </proc/cpuinfo)" && make install
+make -j"$(nproc)" && make install
 rm -rf "$(pwd)"

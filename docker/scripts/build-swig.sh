@@ -10,6 +10,6 @@ rm "swig-${SWIG_VERSION}.tar.gz"
 cd "swig-${SWIG_VERSION}"
 ./autogen.sh 1>log 2>err
 ./configure 1>log 2>err
-make -j "$(grep -c processor </proc/cpuinfo)" 1>log 2>err
+make -j"$(nproc)" 1>log 2>err
 make install 1>log 2>err
 rm -rf "$(pwd)"
