@@ -99,6 +99,7 @@ namespace std {
 %include <boost/system/system_error.hpp>
 
 %include "interfaces/boost_array.i"
+%include "interfaces/boost_exceptions.i"
 
 // Libtorrent exports
 %include <libtorrent/aux_/export.hpp>
