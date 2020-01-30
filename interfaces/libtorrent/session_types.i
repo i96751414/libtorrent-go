@@ -14,3 +14,11 @@ namespace libtorrent {
 }
 
 %include "libtorrent/session_types.hpp"
+
+// Swig seems not to be handling 'using' keyword in some cases
+%{
+using libtorrent::save_state_flags_t;
+using libtorrent::session_flags_t;
+using libtorrent::remove_flags_t;
+using libtorrent::reopen_network_flags_t;
+%}

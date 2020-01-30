@@ -163,6 +163,7 @@ namespace libtorrent {
 %include "interfaces/libtorrent/session_settings.i"
 %include "interfaces/libtorrent/peer_info.i"
 %include "interfaces/libtorrent/storage_defs.i"
+%include "interfaces/libtorrent/storage.i"
 %include "interfaces/libtorrent/pex_flags.i"
 %include "interfaces/libtorrent/torrent_flags.i"
 %include "interfaces/libtorrent/torrent_status.i"

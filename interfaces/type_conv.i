@@ -108,3 +108,6 @@ LIBTORRENT_BITFIELD_CONVERSION(libtorrent::file_flags_tag, std::uint8_t, uint)
 
 // pex_flags
 LIBTORRENT_BITFIELD_CONVERSION(libtorrent::pex_flags_tag, std::uint8_t, uint)
+
+// storage_defs
+LIBTORRENT_STRONG_TYPEDEF_CONVERSION(libtorrent::storage_index_tag_t, std::uint32_t, uint)
