@@ -43,6 +43,12 @@ TYPE_INTEGRAL_CONVERSION(%arg(libtorrent::aux::strong_typedef<underlying_type, t
 %typemap(out) name::size_type               %{    $result = $1;%}
 %enddef
 
+%{typedef void* unsafe_ptr;%}
+%typemap(gotype) unsafe_ptr "unsafe.Pointer"
+%typemap(imtype) unsafe_ptr  "uintptr"
+%typemap(goin) unsafe_ptr    %{    $result = uintptr($input)%}
+%typemap(goout) unsafe_ptr   %{    $result = unsafe.Pointer($1)%}
+
 // string_view
 TYPE_STRING_VIEW_CONVERSION(libtorrent::string_view)
 
