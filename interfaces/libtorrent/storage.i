@@ -8,8 +8,8 @@
 %include "libtorrent/storage.hpp"
 
 %extend libtorrent::storage_interface {
-    int read(char* buf, std::uint16_t size, piece_index_t piece, int offset, storage_error& ec) {
-        libtorrent::iovec_t b = {buf, size};
+    int read(char_ptr buf, std::ptrdiff_t size, piece_index_t piece, int offset, storage_error& ec) {
+        libtorrent::iovec_t b = {(char*) buf, size};
         return $self->readv(b, piece, offset, libtorrent::open_mode::read_only, ec);
     }
 }
