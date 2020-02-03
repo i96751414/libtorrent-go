@@ -51,7 +51,7 @@ TYPE_INTEGRAL_CONVERSION(%arg(libtorrent::aux::strong_typedef<underlying_type, t
 %typemap(out) unsafe_ptr     %{    $result = $1;%}
 %typemap(goout) unsafe_ptr   %{    $result = unsafe.Pointer($1)%}
 
-%{typedef void* char_ptr;%}
+%{typedef char* char_ptr;%}
 %typemap(gotype) char_ptr "[]byte"
 %typemap(imtype) char_ptr  "uintptr"
 %typemap(in) char_ptr      %{    $1 = $input;%}

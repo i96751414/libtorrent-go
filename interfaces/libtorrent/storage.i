@@ -9,7 +9,7 @@
 
 %extend libtorrent::storage_interface {
     int read(char_ptr buf, std::ptrdiff_t size, piece_index_t piece, int offset, storage_error& ec) {
-        libtorrent::iovec_t b = {(char*) buf, size};
+        libtorrent::iovec_t b = {buf, size};
         return $self->readv(b, piece, offset, libtorrent::open_mode::read_only, ec);
     }
 }
