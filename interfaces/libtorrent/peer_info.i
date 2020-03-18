@@ -2,6 +2,8 @@
 #include "libtorrent/peer_info.hpp"
 %}
 
+%ignore libtorrent::peer_info::peer_info(peer_info &&);
+
 namespace libtorrent {
     struct peer_flags_tag;
     // %template(peer_flags_t) flags::bitfield_flag<std::uint32_t, peer_flags_tag>;
