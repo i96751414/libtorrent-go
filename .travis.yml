@@ -1,7 +1,7 @@
 sudo: required
 language: go
 go:
-  - "1.13"
+  - "1.14"
 
 env:
   - PLATFORM=android-arm
