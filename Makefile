@@ -140,7 +140,7 @@ else
 	$(DOCKER) run --rm \
 	-u $(USERGRP) \
 	-v "$(GOPATH)":$(DOCKER_GOPATH) \
-	-v "$(WORKDIR)":$(DOCKER_WORKDIR) \
+	-v $(WORKDIR):$(DOCKER_WORKDIR) \
 	-w $(DOCKER_WORKDIR) \
 	-e GOCACHE=$(DOCKER_GOCACHE) \
 	-e GOPATH=$(DOCKER_GOPATH) \
@@ -154,7 +154,7 @@ else
 	$(DOCKER) run --rm \
 	-u $(USERGRP) \
 	-v "$(GOPATH)":$(DOCKER_GOPATH) \
-	-v "$(WORKDIR)":$(DOCKER_WORKDIR) \
+	-v $(WORKDIR):$(DOCKER_WORKDIR) \
 	-w $(DOCKER_WORKDIR) \
 	-e GOCACHE=$(DOCKER_GOCACHE) \
 	-e GOPATH=$(DOCKER_GOPATH) \
@@ -228,7 +228,7 @@ runtest:
 retest:
 	$(DOCKER) run --rm \
 	-v "$(GOPATH)":$(DOCKER_GOPATH) \
-	-v "$(WORKDIR)":$(DOCKER_WORKDIR) \
+	-v $(WORKDIR):$(DOCKER_WORKDIR) \
 	-w $(DOCKER_WORKDIR) \
 	-e GOPATH=$(DOCKER_GOPATH) \
 	$(DOCKER_IMAGE):linux-x64 make runtest;
