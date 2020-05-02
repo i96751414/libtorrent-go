@@ -1,4 +1,5 @@
-FROM cross-compiler:windows-x64
+ARG IMAGE_TAG=latest
+FROM i96751414/cross-compiler-windows-x64:${IMAGE_TAG}
 
 RUN mkdir -p /build
 WORKDIR /build

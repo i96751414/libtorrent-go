@@ -20,9 +20,6 @@ env:
 services:
   - docker
 
-before_install:
-  - make pull
-
 install:
   - make env
 
@@ -30,7 +27,7 @@ script:
   - set -e
   - make $PLATFORM
   - |
-    if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ]; then
+    if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ -n "${TRAVIS_TAG}" ]; then
       docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       make push
     fi

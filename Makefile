@@ -5,7 +5,12 @@ CC = cc
 CXX = c++
 PKG_CONFIG = pkg-config
 DOCKER = docker
-DOCKER_IMAGE = $(NAME)
+CROSS_COMPILER_TAG = latest
+TAG = $(shell git describe --tags | cut -c2-)
+ifeq ($(TAG),)
+	TAG := dev
+endif
+
 PLATFORMS = \
 	android-arm \
 	android-arm64 \
@@ -27,8 +32,8 @@ BOOST_SHA256 = 8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406
 OPENSSL_VERSION = 1.1.1b
 OPENSSL_SHA256 = 5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
 
-SWIG_VERSION = be491506a4036f627778b71641dff1fdf66b9a67  # master on 2019/03/01
-SWIG_SHA256 = c8d87a9bd8c01dfb7883b9341e13742b3f209cf817fd0d72232f434e061538ff
+SWIG_VERSION = ae0efd3d742ad083312fadbc652d4d66fdad6f4d  # master on 2020/03/05
+SWIG_SHA256 = 1bf1a98e7c83c8928bf19b9f8489f2a26ec1c8fab8ffa3bd413037e1a4fe8421
 
 GOLANG_VERSION = 1.14
 GOLANG_SRC_SHA256 = 6d643e46ad565058c7a39dac01144172ef9bd476521f42148be59249e4b74389
@@ -36,7 +41,7 @@ GOLANG_SRC_SHA256 = 6d643e46ad565058c7a39dac01144172ef9bd476521f42148be59249e4b7
 GOLANG_BOOTSTRAP_VERSION = 1.4-bootstrap-20170531
 GOLANG_BOOTSTRAP_SHA256 = 49f806f66762077861b7de7081f586995940772d29d4c45068c134441a743fa2
 
-LIBTORRENT_VERSION = RC_1_2
+LIBTORRENT_VERSION = b9b54436b8b214420745e5ff722112316d7d85c7 # RC_1_2 (1.2.6)
 
 ifeq ($(GOPATH),)
 	GOPATH = $(shell go env GOPATH)
@@ -144,7 +149,7 @@ else
 	-w $(DOCKER_WORKDIR) \
 	-e GOCACHE=$(DOCKER_GOCACHE) \
 	-e GOPATH=$(DOCKER_GOPATH) \
-	$(DOCKER_IMAGE):$@ make re;
+	$(PROJECT)/$(NAME)-$@:latest make re;
 endif
 
 debug:
@@ -158,7 +163,7 @@ else
 	-w $(DOCKER_WORKDIR) \
 	-e GOCACHE=$(DOCKER_GOCACHE) \
 	-e GOPATH=$(DOCKER_GOPATH) \
-	$(DOCKER_IMAGE):$(PLATFORM) bash -c \
+	$(PROJECT)/$(NAME)-$(PLATFORM):latest bash -c \
 	'make re OPTS=-work; \
 	cp -rf /tmp/go-build* $(DOCKER_WORKDIR)/work'
 endif
@@ -196,7 +201,9 @@ env:
 		--build-arg GOLANG_BOOTSTRAP_VERSION=$(GOLANG_BOOTSTRAP_VERSION) \
 		--build-arg GOLANG_BOOTSTRAP_SHA256=$(GOLANG_BOOTSTRAP_SHA256) \
 		--build-arg LIBTORRENT_VERSION=$(LIBTORRENT_VERSION) \
-		-t $(DOCKER_IMAGE):$(PLATFORM) \
+		-t $(PROJECT)/$(NAME)-$(PLATFORM):$(TAG) \
+		-t $(PROJECT)/$(NAME)-$(PLATFORM):latest \
+		--build-arg IMAGE_TAG=$(CROSS_COMPILER_TAG) \
 		-f docker/$(PLATFORM).Dockerfile docker
 
 envs:
@@ -210,25 +217,7 @@ pull-all:
 	done
 
 pull:
-	docker pull $(PROJECT)/cross-compiler:$(PLATFORM)
-	docker tag $(PROJECT)/cross-compiler:$(PLATFORM) cross-compiler:$(PLATFORM)
+	docker pull $(PROJECT)/$(NAME)-$(PLATFORM):latest
 
 push:
-	docker tag libtorrent-go:$(PLATFORM) $(PROJECT)/libtorrent-go:$(PLATFORM)
-	docker push $(PROJECT)/libtorrent-go:$(PLATFORM)
-
-runtest:
-	CC=${CC} CXX=$(CXX) \
-	PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) \
-	CGO_ENABLED=1 \
-	GOOS=$(GOOS) GOARCH=$(GOARCH) GOARM=$(GOARM) \
-	PATH=.:$$PATH \
-	cd test; go run -x test.go; cd ..
-
-retest:
-	$(DOCKER) run --rm \
-	-v "$(GOPATH)":$(DOCKER_GOPATH) \
-	-v $(WORKDIR):$(DOCKER_WORKDIR) \
-	-w $(DOCKER_WORKDIR) \
-	-e GOPATH=$(DOCKER_GOPATH) \
-	$(DOCKER_IMAGE):linux-x64 make runtest;
+	docker push $(PROJECT)/$(NAME)-$(PLATFORM)

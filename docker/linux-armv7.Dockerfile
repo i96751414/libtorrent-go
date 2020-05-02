@@ -1,4 +1,5 @@
-FROM cross-compiler:linux-armv7
+ARG IMAGE_TAG=latest
+FROM i96751414/cross-compiler-linux-armv7:${IMAGE_TAG}
 
 RUN mkdir -p /build
 WORKDIR /build
