@@ -25,18 +25,18 @@ PLATFORMS = \
 	windows-x64 \
 	windows-x86
 
-BOOST_VERSION = 1.69.0
+BOOST_VERSION = 1.72.0
 BOOST_VERSION_FILE = $(shell echo $(BOOST_VERSION) | sed s/\\./_/g)
-BOOST_SHA256 = 8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406
+BOOST_SHA256 = 59c9b274bc451cf91a9ba1dd2c7fdcaf5d60b1b3aa83f2c9fa143417cc660722
 
-OPENSSL_VERSION = 1.1.1b
-OPENSSL_SHA256 = 5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
+OPENSSL_VERSION = 1.1.1f
+OPENSSL_SHA256 = 186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35
 
 SWIG_VERSION = ae0efd3d742ad083312fadbc652d4d66fdad6f4d  # master on 2020/03/05
 SWIG_SHA256 = 1bf1a98e7c83c8928bf19b9f8489f2a26ec1c8fab8ffa3bd413037e1a4fe8421
 
-GOLANG_VERSION = 1.14
-GOLANG_SRC_SHA256 = 6d643e46ad565058c7a39dac01144172ef9bd476521f42148be59249e4b74389
+GOLANG_VERSION = 1.14.2
+GOLANG_SRC_SHA256 = 98de84e69726a66da7b4e58eac41b99cbe274d7e8906eeb8a5b7eb0aadee7f7c
 
 GOLANG_BOOTSTRAP_VERSION = 1.4-bootstrap-20170531
 GOLANG_BOOTSTRAP_SHA256 = 49f806f66762077861b7de7081f586995940772d29d4c45068c134441a743fa2
@@ -75,10 +75,19 @@ endif
 
 ifeq ($(TARGET_OS), windows)
 	GOOS = windows
+	ifeq ($(TARGET_ARCH), x64)
+		CC_DEFINES = -DSWIGWORDSIZE32
+	endif
 else ifeq ($(TARGET_OS), darwin)
 	GOOS = darwin
+	CC = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang
+	CXX = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang++
+	CC_DEFINES = -DSWIGMAC
 else ifeq ($(TARGET_OS), linux)
 	GOOS = linux
+	ifeq ($(TARGET_ARCH), arm64)
+		CC_DEFINES = -DSWIGWORDSIZE64
+	endif
 else ifeq ($(TARGET_OS), android)
 	GOOS = android
 	ifeq ($(TARGET_ARCH), arm)
@@ -86,37 +95,18 @@ else ifeq ($(TARGET_OS), android)
 	else
 		GOARM =
 	endif
-	GO_LDFLAGS = -extldflags=-pie
+	CC = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang
+	CXX = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang++
+	GO_LDFLAGS = -flto -extldflags=-pie
+	ifeq ($(TARGET_ARCH), arm64)
+		CC_DEFINES = -DSWIGWORDSIZE64
+	endif
 endif
 
 ifneq ($(CROSS_ROOT),)
 	CROSS_CFLAGS = -I$(CROSS_ROOT)/include -I$(CROSS_ROOT)/$(CROSS_TRIPLE)/include
 	CROSS_LDFLAGS = -L$(CROSS_ROOT)/lib
 	PKG_CONFIG_PATH = $(CROSS_ROOT)/lib/pkgconfig
-endif
-
-ifeq ($(TARGET_OS), windows)
-	CC_DEFINES += -DSWIGWIN
-	CC_DEFINES += -D_WIN32_WINNT=0x0600
-	ifeq ($(TARGET_ARCH), x64)
-		CC_DEFINES += -DSWIGWORDSIZE32
-	endif
-else ifeq ($(TARGET_OS), linux)
-	ifeq ($(TARGET_ARCH), arm64)
-		CC_DEFINES += -DSWIGWORDSIZE64
-	endif
-else ifeq ($(TARGET_OS), darwin)
-	CC = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang
-	CXX = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang++
-	CC_DEFINES += -DSWIGMAC
-	CC_DEFINES += -DBOOST_HAS_PTHREADS
-else ifeq ($(TARGET_OS), android)
-	CC = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang
-	CXX = $(CROSS_ROOT)/bin/$(CROSS_TRIPLE)-clang++
-	GO_LDFLAGS += -flto
-	ifeq ($(TARGET_ARCH), arm64)
-		CC_DEFINES += -DSWIGWORDSIZE64
-	endif
 endif
 
 DOCKER_GOPATH = "/go"
@@ -139,9 +129,6 @@ all:
 	done
 
 $(PLATFORMS):
-ifeq ($@, all)
-	$(MAKE) all
-else
 	$(DOCKER) run --rm \
 	-u $(USERGRP) \
 	-v "$(GOPATH)":$(DOCKER_GOPATH) \
@@ -149,8 +136,7 @@ else
 	-w $(DOCKER_WORKDIR) \
 	-e GOCACHE=$(DOCKER_GOCACHE) \
 	-e GOPATH=$(DOCKER_GOPATH) \
-	$(PROJECT)/$(NAME)-$@:latest make re;
-endif
+	$(PROJECT)/$(NAME)-$@:latest make re
 
 debug:
 ifeq ($(PLATFORM),)
@@ -169,10 +155,10 @@ else
 endif
 
 defines:
-	$(shell ( \
+	( \
 	echo $(CC_DEFINES) | sed -E 's/-D([a-zA-Z0-9_()]+)=?/\n#define \1 /g' && \
 	$(CC) -dM -E - </dev/null | grep -E "__WORDSIZE|__x86_64|__x86_64__" | sed -E 's/#define[[:space:]]+([a-zA-Z0-9_()]+)(.*)/#ifndef \1\n#define \1\2\n#endif/g' \
-	) > $(DEFINES))
+	) > $(DEFINES)
 
 build:
 	CC=$(CC) CXX=$(CXX) \
