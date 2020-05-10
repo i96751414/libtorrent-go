@@ -17,14 +17,6 @@ ARG GOLANG_BOOTSTRAP_VERSION
 ARG GOLANG_BOOTSTRAP_SHA256
 ARG LIBTORRENT_VERSION
 
-# Local testing
-# COPY files/boost_${BOOST_VERSION_FILE}.tar.bz2 /build/
-# COPY files/openssl-${OPENSSL_VERSION}.tar.gz /build/
-# COPY files/swig-${SWIG_VERSION}.tar.gz /build/
-# COPY files/go${GOLANG_VERSION}.src.tar.gz /build/golang.tar.gz
-# COPY files/go${GOLANG_BOOTSTRAP_VERSION}.tar.gz /build/golang-bootstrap.tar.gz
-# COPY files/${LIBTORRENT_VERSION}.tar.gz /build/
-
 # Fix Boost using wrong archiver / ignoring <archiver> flags
 # https://svn.boost.org/trac/boost/ticket/12573
 # https://github.com/boostorg/build/blob/boost-1.63.0/src/tools/clang-darwin.jam#L133
