@@ -48,28 +48,29 @@ jobs:
       - name: Build ${{ matrix.platform }} docker image
         run: make env PLATFORM=${{ matrix.platform }}
 
-      - name: Build libtorrent-go-${{ matrix.platform }}
+      - name: Build libtorrent-go ${{ matrix.platform }}
         run: |
           mkdir build
-          make ${{ matrix.platform }} GOPATH=$(readlink -f build)
+          make ${{ matrix.platform }} GOPATH="$(readlink -f build)"
 
-      - name: Generate libtorrent-go-${{ matrix.platform }} zip
+      - name: Generate libtorrent-go ${{ matrix.platform }} zip
+        id: generate_zip
         if: success() && github.event_name == 'create' && startsWith(github.ref, 'refs/tags/')
         run: |
           cd build/pkg
           asset_name=$(ls -d1 *)
-          zip -9 -r ${asset_name}{.zip,}
+          zip -9 -r "${asset_name}"{.zip,}
           echo "::set-output name=asset_path::build/pkg/${asset_name}.zip"
           echo "::set-output name=asset_name::${asset_name}.zip)"
 
       - name: Push ${{ matrix.platform }} docker image
         if: success() && github.event_name == 'create' && startsWith(github.ref, 'refs/tags/')
         run: |
-          docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+          docker login -u="${{ secrets.DOCKER_USERNAME }}" -p="${{ secrets.DOCKER_PASSWORD }}"
           make push PLATFORM=${{ matrix.platform }}
 
       - name: Upload zip to github release
-        id: upload-release-asset
+        id: upload_release_asset
         if: success() && github.event_name == 'create' && startsWith(github.ref, 'refs/tags/')
         uses: actions/upload-release-asset@v1.0.1
         env:

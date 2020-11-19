@@ -121,7 +121,7 @@ OUT_LIBRARY = "$(OUT_PATH)/$(GO_PACKAGE).a"
 
 USERGRP = "$(shell id -u):$(shell id -g)"
 
-.PHONY: $(PLATFORMS)
+.PHONY: $(PLATFORMS) build
 
 all:
 	for i in $(PLATFORMS); do \
