@@ -11,9 +11,29 @@ on:
       - v*
 
 jobs:
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'create' && startsWith(github.ref, 'refs/tags/')
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
   build:
     name: Build
     runs-on: ubuntu-latest
+    if: always()
+    needs: create_release
     strategy:
       max-parallel: 5
       matrix:
@@ -30,11 +50,32 @@ jobs:
 
       - name: Build libtorrent-go-${{ matrix.platform }}
         run: |
-          mkdir tmp
-          make ${{ matrix.platform }} GOPATH=tmp
+          mkdir build
+          make ${{ matrix.platform }} GOPATH=$(readlink -f build)
+
+      - name: Generate libtorrent-go-${{ matrix.platform }} zip
+        if: success() && github.event_name == 'create' && startsWith(github.ref, 'refs/tags/')
+        run: |
+          cd build/pkg
+          asset_name=$(ls -d1 *)
+          zip -9 -r ${asset_name}{.zip,}
+          echo "::set-output name=asset_path::build/pkg/${asset_name}.zip"
+          echo "::set-output name=asset_name::${asset_name}.zip)"
 
       - name: Push ${{ matrix.platform }} docker image
         if: success() && github.event_name == 'create' && startsWith(github.ref, 'refs/tags/')
         run: |
           docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
           make push PLATFORM=${{ matrix.platform }}
+
+      - name: Upload zip to github release
+        id: upload-release-asset
+        if: success() && github.event_name == 'create' && startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.generate_zip.outputs.asset_path }}
+          asset_name: ${{ steps.generate_zip.outputs.asset_name }}
+          asset_content_type: application/zip
