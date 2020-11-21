@@ -146,6 +146,7 @@ namespace libtorrent {
 %include "interfaces/libtorrent/time.i"
 %include "interfaces/libtorrent/flags.i"
 %include "interfaces/libtorrent/download_priority.i"
+%include "interfaces/libtorrent/memory_storage.i"
 %include "interfaces/libtorrent/bitfield.i"
 %include "interfaces/libtorrent/socket.i"
 %include "interfaces/libtorrent/span.i"
