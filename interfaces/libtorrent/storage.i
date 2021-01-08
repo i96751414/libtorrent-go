@@ -4,6 +4,7 @@
 
 %ignore libtorrent::storage_interface::readv;
 %ignore libtorrent::storage_interface::writev;
+%ignore libtorrent::storage_interface::m_settings;
 
 %include "libtorrent/storage.hpp"
 
