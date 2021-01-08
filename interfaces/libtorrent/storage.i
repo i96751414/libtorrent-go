@@ -4,6 +4,8 @@
 
 %ignore libtorrent::storage_interface::readv;
 %ignore libtorrent::storage_interface::writev;
+// SWIG fails to initialise atomic: https://github.com/swig/swig/issues/1185
+// In cases this variable is required, a typemap needs to be created
 %ignore libtorrent::storage_interface::m_settings;
 
 %include "libtorrent/storage.hpp"
