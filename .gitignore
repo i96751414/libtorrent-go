@@ -27,3 +27,4 @@ interfaces/defines.i
 
 # For debugging
 work
+libtorrent_swig.go

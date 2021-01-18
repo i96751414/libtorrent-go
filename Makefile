@@ -115,6 +115,7 @@ DOCKER_GOCACHE = "/tmp/.cache"
 
 WORKDIR = "$(shell pwd)"
 DEFINES = $(WORKDIR)/interfaces/defines.i
+LIBTORRENT_SWIG=$(WORKDIR)/libtorrent_swig.go
 WORK = $(WORKDIR)/work
 OUT_PATH = "$(GOPATH)/pkg/$(GOOS)_$(GOARCH)$(PATH_SUFFIX)"
 OUT_LIBRARY = "$(OUT_PATH)/$(GO_PACKAGE).a"
@@ -152,6 +153,7 @@ else
 	$(PROJECT)/$(NAME)-$(PLATFORM):latest bash -c \
 	'make re OPTS=-work; \
 	cp -rf /tmp/go-build* $(DOCKER_WORKDIR)/work'
+	cp $(WORK)/*/_libtorrent_swig.go $(LIBTORRENT_SWIG)
 endif
 
 defines:
@@ -169,7 +171,7 @@ build:
 	go install $(OPTS) -v -ldflags '$(GO_LDFLAGS)' -x $(PKGDIR)
 
 clean:
-	rm -rf $(OUT_LIBRARY) $(DEFINES) $(WORK)
+	rm -rf $(OUT_LIBRARY) $(DEFINES) $(WORK) $(LIBTORRENT_SWIG)
 
 re: clean defines build
 
