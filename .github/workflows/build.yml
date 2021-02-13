@@ -39,7 +39,12 @@ jobs:
           pkg_path="build/pkg"
           cd "${pkg_path}"
           folder_name=$(ls -d1 *)
-          asset_name="libtorrent-go.$(sed -E 's|refs/tags/v?||' <<< "${{ github.ref }}").${folder_name}.zip"
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            classifier=$(sed -E 's|^refs/tags/v?||' <<<"${{ github.ref }}")
+          else
+            classifier=$(git rev-parse --short HEAD)
+          fi
+          asset_name="libtorrent-go.${classifier}.${folder_name}.zip"
           zip -9 -r "${asset_name}" "${folder_name}"
           echo "::set-output name=asset_path::${pkg_path}/${asset_name}"
           echo "::set-output name=asset_name::${asset_name})"
