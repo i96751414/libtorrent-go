@@ -53,6 +53,8 @@ ENV BOOST_CXX c++
 ENV BOOST_OS darwin
 ENV BOOST_TARGET_OS darwin
 ENV BOOST_BOOTSTRAP --with-toolset=clang
+ENV BOOST_ROOT "/build/boost"
+ENV BOOST_BUILD_PATH "${BOOST_ROOT}/tools/build"
 RUN ./build-boost.sh
 
 # Install libtorrent

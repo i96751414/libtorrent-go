@@ -43,6 +43,8 @@ ENV BOOST_CXX c++
 ENV BOOST_OS mingw32
 ENV BOOST_TARGET_OS windows
 ENV BOOST_OPTS address-model=32 architecture=x86 threadapi=win32
+ENV BOOST_ROOT "/build/boost"
+ENV BOOST_BUILD_PATH "${BOOST_ROOT}/tools/build"
 RUN ./build-boost.sh
 
 # Install libtorrent

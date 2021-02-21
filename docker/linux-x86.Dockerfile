@@ -42,6 +42,8 @@ ENV BOOST_CC gcc
 ENV BOOST_CXX c++
 ENV BOOST_OS linux
 ENV BOOST_TARGET_OS linux
+ENV BOOST_ROOT "/build/boost"
+ENV BOOST_BUILD_PATH "${BOOST_ROOT}/tools/build"
 RUN ./build-boost.sh
 
 # Install libtorrent
