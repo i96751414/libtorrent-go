@@ -1,28 +1,28 @@
-libtorrent-go [![Build Status](https://github.com/i96751414/libtorrent-go/workflows/build/badge.svg)](https://github.com/i96751414/libtorrent-go/actions?query=workflow%3Abuild)
-=============
+# libtorrent-go
 
-SWIG Go bindings for [libtorrent-rasterbar](https://github.com/arvidn/libtorrent)
+[![Build Status](https://github.com/i96751414/libtorrent-go/workflows/build/badge.svg)](https://github.com/i96751414/libtorrent-go/actions?query=workflow%3Abuild)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/72b98f810dc940269ca765d4b709f7ee)](https://www.codacy.com/gh/i96751414/libtorrent-go/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=i96751414/libtorrent-go&amp;utm_campaign=Badge_Grade)
 
-This is a fork from scakemyer's [libtorrent-go](https://github.com/scakemyer/libtorrent-go).
+SWIG Go bindings for [libtorrent-rasterbar](https://github.com/arvidn/libtorrent).
 
-Requirements
-------------
-- [Docker](https://docs.docker.com/engine/installation/)
-- [golang](https://golang.org/doc/install)
+## Requirements
 
-Download and Build
-------------------
+-   [Docker](https://docs.docker.com/engine/installation/)
+-   [golang](https://golang.org/doc/install)
 
-- Download libtorrent-go:
+## Download and Build
+
+-   Download libtorrent-go:
 
         go get github.com/i96751414/libtorrent-go
         cd $GOPATH/src/github.com/i96751414/libtorrent-go
 
-- Pull the cross-compiler image for your platform:
+-   Pull the cross-compiler image for your platform:
 
         make pull PLATFORM=linux-x64
 
-- Next, you need to prepare Docker environments. There are two ways to do it:
+-   Next, you need to prepare Docker environments. There are two ways to do it:
+
     - Download and build all needed development packages:
 
             make envs

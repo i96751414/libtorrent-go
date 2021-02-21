@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
 set -ex
 
 scripts_path=$(dirname "$(readlink -f "$0")")

@@ -26,7 +26,6 @@ PLATFORMS = \
 	windows-x86
 
 BOOST_VERSION = 1.72.0
-BOOST_VERSION_FILE = $(shell echo $(BOOST_VERSION) | sed s/\\./_/g)
 BOOST_SHA256 = 59c9b274bc451cf91a9ba1dd2c7fdcaf5d60b1b3aa83f2c9fa143417cc660722
 
 OPENSSL_VERSION = 1.1.1f
@@ -178,7 +177,6 @@ re: clean defines build
 env:
 	$(DOCKER) build \
 		--build-arg BOOST_VERSION=$(BOOST_VERSION) \
-		--build-arg BOOST_VERSION_FILE=$(BOOST_VERSION_FILE) \
 		--build-arg BOOST_SHA256=$(BOOST_SHA256) \
 		--build-arg OPENSSL_VERSION=$(OPENSSL_VERSION) \
 		--build-arg OPENSSL_SHA256=$(OPENSSL_SHA256) \

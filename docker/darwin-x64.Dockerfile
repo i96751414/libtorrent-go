@@ -5,7 +5,6 @@ RUN mkdir -p /build
 WORKDIR /build
 
 ARG BOOST_VERSION
-ARG BOOST_VERSION_FILE
 ARG BOOST_SHA256
 ARG OPENSSL_VERSION
 ARG OPENSSL_SHA256
@@ -17,15 +16,17 @@ ARG GOLANG_BOOTSTRAP_VERSION
 ARG GOLANG_BOOTSTRAP_SHA256
 ARG LIBTORRENT_VERSION
 
+COPY scripts/common.sh /build/
+
 # Fix Boost using wrong archiver / ignoring <archiver> flags
 # https://svn.boost.org/trac/boost/ticket/12573
 # https://github.com/boostorg/build/blob/boost-1.63.0/src/tools/clang-darwin.jam#L133
 RUN mv /usr/bin/ar /usr/bin/ar.orig && \
     mv /usr/bin/strip /usr/bin/strip.orig && \
     mv /usr/bin/ranlib /usr/bin/ranlib.orig && \
-    ln -sf ${CROSS_ROOT}/bin/${CROSS_TRIPLE}-ar /usr/bin/ar && \
-    ln -sf ${CROSS_ROOT}/bin/${CROSS_TRIPLE}-strip /usr/bin/strip && \
-    ln -sf ${CROSS_ROOT}/bin/${CROSS_TRIPLE}-ranlib /usr/bin/ranlib
+    ln -sf "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-ar" /usr/bin/ar && \
+    ln -sf "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-strip" /usr/bin/strip && \
+    ln -sf "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-ranlib" /usr/bin/ranlib
 
 # Install Boost.System
 COPY scripts/build-boost.sh /build/

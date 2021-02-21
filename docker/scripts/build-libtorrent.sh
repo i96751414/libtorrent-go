@@ -1,7 +1,8 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
 set -ex
+
 scripts_path=$(dirname "$(readlink -f "$0")")
+
 if [ -v LT_PTHREADS ]; then
   echo "#define BOOST_SP_USE_PTHREADS" >>"${CROSS_ROOT}/include/boost/config/user.hpp"
 fi
@@ -11,6 +12,7 @@ fi
 tar -xzf "${LIBTORRENT_VERSION}.tar.gz"
 rm "${LIBTORRENT_VERSION}.tar.gz"
 cd "libtorrent-${LIBTORRENT_VERSION//\\./_}"
+# Update includes so swig does not fail
 LIBTORRENT_INCLUDE="$(pwd)/include/libtorrent" "${scripts_path}/update-includes.sh"
 ./autotool.sh
 # shellcheck disable=SC2016

@@ -47,7 +47,6 @@ namespace std {
     %template(stdPairStringInt) pair<string, int>;
 }
 
-
 %rename("%(camelcase)s", %$isclass) "";
 %rename("%(camelcase)s", %$isvariable) "";
 %rename("%(camelcase)s", %$isenumitem) "";
@@ -100,6 +99,9 @@ namespace std {
 
 %include "interfaces/boost_array.i"
 %include "interfaces/boost_exceptions.i"
+
+// Wrap libtorrent exceptions
+//%include "interfaces/exceptions.i"
 
 // Libtorrent exports
 %include <libtorrent/aux_/export.hpp>

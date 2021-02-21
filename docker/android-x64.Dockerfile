@@ -5,7 +5,6 @@ RUN mkdir -p /build
 WORKDIR /build
 
 ARG BOOST_VERSION
-ARG BOOST_VERSION_FILE
 ARG BOOST_SHA256
 ARG OPENSSL_VERSION
 ARG OPENSSL_SHA256
@@ -16,6 +15,8 @@ ARG GOLANG_SRC_SHA256
 ARG GOLANG_BOOTSTRAP_VERSION
 ARG GOLANG_BOOTSTRAP_SHA256
 ARG LIBTORRENT_VERSION
+
+COPY scripts/common.sh /build/
 
 # Install Boost.System
 COPY scripts/build-boost.sh /build/
@@ -53,4 +54,4 @@ ENV LT_PTHREADS TRUE
 ENV LT_FLAGS -fPIC -fPIE
 ENV LT_CXXFLAGS -Wno-macro-redefined -Wno-c++11-extensions
 RUN ./build-libtorrent.sh
-RUN ln -s ${CROSS_ROOT}/${CROSS_TRIPLE}/lib64/libgnustl_shared.so ${CROSS_ROOT}/${CROSS_TRIPLE}/lib/libgnustl_shared.so
+RUN ln -s "${CROSS_ROOT}/${CROSS_TRIPLE}/lib64/libgnustl_shared.so" "${CROSS_ROOT}/${CROSS_TRIPLE}/lib/libgnustl_shared.so"
