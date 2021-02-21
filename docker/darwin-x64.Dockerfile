@@ -4,8 +4,6 @@ FROM i96751414/cross-compiler-darwin-x64:${IMAGE_TAG}
 RUN mkdir -p /build
 WORKDIR /build
 
-ARG BOOST_VERSION
-ARG BOOST_SHA256
 ARG OPENSSL_VERSION
 ARG OPENSSL_SHA256
 ARG SWIG_VERSION
@@ -14,9 +12,29 @@ ARG GOLANG_VERSION
 ARG GOLANG_SRC_SHA256
 ARG GOLANG_BOOTSTRAP_VERSION
 ARG GOLANG_BOOTSTRAP_SHA256
+ARG BOOST_VERSION
+ARG BOOST_SHA256
 ARG LIBTORRENT_VERSION
 
 COPY scripts/common.sh /build/
+
+# Install OpenSSL
+COPY scripts/build-openssl.sh /build/
+ENV OPENSSL_OPTS darwin64-x86_64-cc
+RUN ./build-openssl.sh
+
+# Install SWIG
+COPY scripts/build-swig.sh /build/
+RUN ./build-swig.sh
+
+# Install Golang
+COPY scripts/build-golang.sh /build/
+ENV GOLANG_CC ${CROSS_TRIPLE}-cc
+ENV GOLANG_CXX ${CROSS_TRIPLE}-c++
+ENV GOLANG_OS darwin
+ENV GOLANG_ARCH amd64
+RUN ./build-golang.sh
+ENV PATH ${PATH}:/usr/local/go/bin
 
 # Fix Boost using wrong archiver / ignoring <archiver> flags
 # https://svn.boost.org/trac/boost/ticket/12573
@@ -37,34 +55,15 @@ ENV BOOST_TARGET_OS darwin
 ENV BOOST_BOOTSTRAP --with-toolset=clang
 RUN ./build-boost.sh
 
+# Install libtorrent
+COPY scripts/update-includes.sh /build/
+COPY scripts/build-libtorrent.sh /build/
+ENV LT_OSXCROSS TRUE
+ENV LT_CFLAGS -O2
+ENV LT_CXXFLAGS -std=c++11 -Wno-c++11-extensions -Wno-c++11-long-long ${LT_CFLAGS}
+RUN ./build-libtorrent.sh
+
 # Move back ar, strip and ranlib...
 RUN mv /usr/bin/ar.orig /usr/bin/ar && \
     mv /usr/bin/strip.orig /usr/bin/strip && \
     mv /usr/bin/ranlib.orig /usr/bin/ranlib
-
-# Install OpenSSL
-COPY scripts/build-openssl.sh /build/
-ENV OPENSSL_OPTS darwin64-x86_64-cc
-RUN ./build-openssl.sh
-
-# Install SWIG
-COPY scripts/build-swig.sh /build/
-RUN ./build-swig.sh
-
-# Install Golang
-COPY scripts/build-golang.sh /build/
-ENV GOLANG_CC ${CROSS_TRIPLE}-cc
-ENV GOLANG_CXX ${CROSS_TRIPLE}-c++
-ENV GOLANG_OS darwin
-ENV GOLANG_ARCH amd64
-RUN ./build-golang.sh
-ENV PATH ${PATH}:/usr/local/go/bin
-
-# Install libtorrent
-COPY scripts/update-includes.sh /build/
-COPY scripts/build-libtorrent.sh /build/
-ENV LT_CC ${CROSS_TRIPLE}-cc
-ENV LT_CXX ${CROSS_TRIPLE}-c++
-ENV LT_OSXCROSS TRUE
-ENV LT_CXXFLAGS -std=c++11 -Wno-c++11-extensions -Wno-c++11-long-long
-RUN ./build-libtorrent.sh

@@ -4,8 +4,6 @@ FROM i96751414/cross-compiler-windows-x64:${IMAGE_TAG}
 RUN mkdir -p /build
 WORKDIR /build
 
-ARG BOOST_VERSION
-ARG BOOST_SHA256
 ARG OPENSSL_VERSION
 ARG OPENSSL_SHA256
 ARG SWIG_VERSION
@@ -14,18 +12,11 @@ ARG GOLANG_VERSION
 ARG GOLANG_SRC_SHA256
 ARG GOLANG_BOOTSTRAP_VERSION
 ARG GOLANG_BOOTSTRAP_SHA256
+ARG BOOST_VERSION
+ARG BOOST_SHA256
 ARG LIBTORRENT_VERSION
 
 COPY scripts/common.sh /build/
-
-# Install Boost.System
-COPY scripts/build-boost.sh /build/
-ENV BOOST_CC gcc
-ENV BOOST_CXX c++
-ENV BOOST_OS mingw64
-ENV BOOST_TARGET_OS windows
-ENV BOOST_OPTS address-model=64 architecture=x86 threadapi=win32
-RUN ./build-boost.sh
 
 # Install OpenSSL
 COPY scripts/build-openssl.sh /build/
@@ -45,12 +36,20 @@ ENV GOLANG_ARCH amd64
 RUN ./build-golang.sh
 ENV PATH ${PATH}:/usr/local/go/bin
 
+# Install Boost.System
+COPY scripts/build-boost.sh /build/
+ENV BOOST_CC gcc
+ENV BOOST_CXX c++
+ENV BOOST_OS mingw64
+ENV BOOST_TARGET_OS windows
+ENV BOOST_OPTS address-model=64 architecture=x86 threadapi=win32
+ENV BOOST_ROOT "/build/boost"
+ENV BOOST_BUILD_PATH "${BOOST_ROOT}/tools/build"
+RUN ./build-boost.sh
+
 # Install libtorrent
 COPY scripts/update-includes.sh /build/
 COPY scripts/build-libtorrent.sh /build/
-ENV LT_CC ${CROSS_TRIPLE}-cc
-ENV LT_CXX ${CROSS_TRIPLE}-c++
-ENV LT_FLAGS -liphlpapi -lmswsock -DUNICODE -D_UNICODE -DWIN32 -DWIN32_LEAN_AND_MEAN -DIPV6_TCLASS=39 -D_WIN32_WINNT=0x0600
-ENV LT_CXXFLAGS -std=c++11
-ENV LT_LIBS -liphlpapi -lmswsock
+ENV LT_CFLAGS -O2 -liphlpapi -lmswsock -DUNICODE -D_UNICODE -DWIN32 -DWIN32_LEAN_AND_MEAN -DIPV6_TCLASS=39 -D_WIN32_WINNT=0x0600
+ENV LT_CXXFLAGS -std=c++11 ${LT_CFLAGS}
 RUN ./build-libtorrent.sh
