@@ -206,4 +206,5 @@ pull:
 	docker pull $(PROJECT)/$(NAME)-$(PLATFORM):latest
 
 push:
-	docker push $(PROJECT)/$(NAME)-$(PLATFORM)
+	docker push $(PROJECT)/$(NAME)-$(PLATFORM):latest
+	docker push $(PROJECT)/$(NAME)-$(PLATFORM):$(TAG)
