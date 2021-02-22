@@ -12,8 +12,6 @@ fi
 tar -xzf "${LIBTORRENT_VERSION}.tar.gz"
 rm "${LIBTORRENT_VERSION}.tar.gz"
 cd "libtorrent-${LIBTORRENT_VERSION//\\./_}"
-# Update includes so swig does not fail
-LIBTORRENT_INCLUDE="$(pwd)/include/libtorrent" "${scripts_path}/update-includes.sh"
 ./autotool.sh
 # shellcheck disable=SC2016
 sed -i 's/$PKG_CONFIG openssl --libs-only-/$PKG_CONFIG openssl --static --libs-only-/' ./configure
@@ -33,4 +31,6 @@ CC=${LT_CC} CXX=${LT_CXX} \
   --prefix="${CROSS_ROOT}" \
   --with-boost="${CROSS_ROOT}" --with-boost-libdir="${CROSS_ROOT}/lib" ${LT_OPTS}
 make -j"$(nproc)" && make install
+# Update includes so swig does not fail
+LIBTORRENT_INCLUDE="${CROSS_ROOT}/include/libtorrent" "${scripts_path}/update-includes.sh"
 rm -rf "$(pwd)"
