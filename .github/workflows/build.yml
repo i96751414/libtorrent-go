@@ -47,7 +47,7 @@ jobs:
           asset_name="libtorrent-go.${classifier}.${folder_name}.zip"
           zip -9 -r "${asset_name}" "${folder_name}"
           echo "::set-output name=asset_path::${pkg_path}/${asset_name}"
-          echo "::set-output name=asset_name::${asset_name})"
+          echo "::set-output name=asset_name::${asset_name}"
 
       - name: Upload ${{ matrix.platform }} zip
         uses: actions/upload-artifact@v2
