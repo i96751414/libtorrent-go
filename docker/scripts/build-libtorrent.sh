@@ -21,7 +21,7 @@ fi
 b2 --with-date_time --with-system --with-chrono --with-random --prefix="${CROSS_ROOT}" \
   toolset="${BOOST_CC}-${BOOST_OS}" target-os="${BOOST_TARGET_OS}" link=static runtime-link=static boost-link=static \
   variant=release threading=multi deprecated-functions=off ${BOOST_OPTS} \
-  crypto=openssl openssl-lib="${CROSS_ROOT}/lib" openssl-include="${CROSS_ROOT}/include/openssl" \
+  crypto=openssl openssl-lib="${CROSS_ROOT}/lib" openssl-include="${CROSS_ROOT}/include" \
   cflags="${LT_CFLAGS}" cxxflags="${LT_CXXFLAGS}" -j"$(nproc)" install
 rm -rf "$(pwd)"
 # Update includes so swig does not fail

@@ -3,6 +3,7 @@
 %}
 
 %ignore libtorrent::settings_pack::settings_pack(settings_pack&&);
+%ignore libtorrent::save_settings_to_dict;
 
 %include "libtorrent/settings_pack.hpp"
 
