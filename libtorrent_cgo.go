@@ -1,7 +1,7 @@
 package libtorrent
 
 // #cgo pkg-config: --static libtorrent-rasterbar openssl
-// #cgo CXXFLAGS: -std=c++11 -DTORRENT_NO_DEPRECATE -DTORRENT_USE_OPENSSL -DTORRENT_USE_LIBCRYPTO
+// #cgo CXXFLAGS: -std=c++11
 // #cgo darwin CXXFLAGS: -fvisibility=hidden -fvisibility-inlines-hidden
 // #cgo darwin LDFLAGS: -lm -lstdc++ -framework CoreFoundation -framework SystemConfiguration
 // #cgo !android,linux CXXFLAGS: -I/usr/include/libtorrent -Wno-deprecated-declarations
