@@ -42,17 +42,18 @@ ENV PATH ${PATH}:/usr/local/go/bin
 RUN mv /usr/bin/ar /usr/bin/ar.orig && \
     mv /usr/bin/strip /usr/bin/strip.orig && \
     mv /usr/bin/ranlib /usr/bin/ranlib.orig && \
-    ln -sf "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-ar" /usr/bin/ar && \
-    ln -sf "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-strip" /usr/bin/strip && \
-    ln -sf "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-ranlib" /usr/bin/ranlib
+    ln -s "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-ar" /usr/bin/ar && \
+    ln -s "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-strip" /usr/bin/strip && \
+    ln -s "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-ranlib" /usr/bin/ranlib && \
+    ln -s "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-libtool" /usr/bin/libtool && \
+    ln -s "${CROSS_ROOT}/bin/${CROSS_TRIPLE}-sw_vers" /usr/bin/sw_vers
 
 # Install Boost.System
 COPY scripts/build-boost.sh /build/
-ENV BOOST_CC clang
+ENV BOOST_CC darwin
 ENV BOOST_CXX c++
-ENV BOOST_OS darwin
+ENV BOOST_OS ${MAC_SDK_VERSION}
 ENV BOOST_TARGET_OS darwin
-ENV BOOST_BOOTSTRAP --with-toolset=clang
 ENV BOOST_ROOT "/build/boost"
 ENV BOOST_BUILD_PATH "${BOOST_ROOT}/tools/build"
 RUN ./build-boost.sh
@@ -62,10 +63,11 @@ COPY scripts/update-includes.sh /build/
 COPY scripts/build-libtorrent.sh /build/
 ENV LT_OSXCROSS TRUE
 ENV LT_CFLAGS -O2
-ENV LT_CXXFLAGS -std=c++11 -Wno-c++11-extensions -Wno-c++11-long-long ${LT_CFLAGS}
+ENV LT_CXXFLAGS -std=c++11 -Wno-c++11-extensions -Wno-c++11-long-long -fvisibility=hidden -fvisibility-inlines-hidden ${LT_CFLAGS}
 RUN ./build-libtorrent.sh
 
 # Move back ar, strip and ranlib...
 RUN mv /usr/bin/ar.orig /usr/bin/ar && \
     mv /usr/bin/strip.orig /usr/bin/strip && \
-    mv /usr/bin/ranlib.orig /usr/bin/ranlib
+    mv /usr/bin/ranlib.orig /usr/bin/ranlib && \
+    rm /usr/bin/libtool /usr/bin/sw_vers
