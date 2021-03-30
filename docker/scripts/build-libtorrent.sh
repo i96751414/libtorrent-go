@@ -24,6 +24,7 @@ CC=${LT_CC} CXX=${LT_CXX} \
   CXXFLAGS="${CXXFLAGS} ${LT_CXXFLAGS} ${CFLAGS}" \
   LIBS=${LT_LIBS} \
   ./configure \
+  --with-cxx-standard=11 \
   --enable-static \
   --disable-shared \
   --disable-deprecated-functions \
