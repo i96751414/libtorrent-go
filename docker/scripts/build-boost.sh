@@ -8,7 +8,7 @@ name="boost_${BOOST_VERSION//./_}"
 package_name="${name}.tar.bz2"
 
 if [ ! -f "${package_name}" ]; then
-  wget -q "https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/${package_name}"
+  wget -q "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/${package_name}"
 fi
 echo "${BOOST_SHA256}  ${package_name}" | sha256sum -c -
 tar -xjf "${package_name}"
