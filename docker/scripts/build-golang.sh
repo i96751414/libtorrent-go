@@ -9,7 +9,7 @@ bootstrap_path="${local_path}/bootstrap"
 
 mkdir -p "${bootstrap_path}"
 if [ ! -f "golang-bootstrap.tar.gz" ]; then
-  wget -q "https://dl.google.com/go/go${GOLANG_BOOTSTRAP_VERSION}.tar.gz" -O golang-bootstrap.tar.gz
+  wget --no-check-certificate -q "https://dl.google.com/go/go${GOLANG_BOOTSTRAP_VERSION}.tar.gz" -O golang-bootstrap.tar.gz
 fi
 echo "${GOLANG_BOOTSTRAP_SHA256}  golang-bootstrap.tar.gz" | sha256sum -c -
 tar -C "${bootstrap_path}" -xzf golang-bootstrap.tar.gz

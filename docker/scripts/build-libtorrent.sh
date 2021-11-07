@@ -7,7 +7,7 @@ if [ -v LT_PTHREADS ]; then
   echo "#define BOOST_SP_USE_PTHREADS" >>"${CROSS_ROOT}/include/boost/config/user.hpp"
 fi
 if [ ! -f "${LIBTORRENT_VERSION}.tar.gz" ]; then
-  wget -q "https://github.com/arvidn/libtorrent/archive/${LIBTORRENT_VERSION//\\./_}.tar.gz"
+  wget --no-check-certificate -q "https://github.com/arvidn/libtorrent/archive/${LIBTORRENT_VERSION//\\./_}.tar.gz"
 fi
 tar -xzf "${LIBTORRENT_VERSION}.tar.gz"
 rm "${LIBTORRENT_VERSION}.tar.gz"
