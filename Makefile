@@ -5,7 +5,7 @@ CC = cc
 CXX = c++
 PKG_CONFIG = pkg-config
 DOCKER = docker
-CROSS_COMPILER_TAG = latest
+CROSS_COMPILER_TAG = 0.0.4
 TAG = $(shell git describe --tags | cut -c2-)
 ifeq ($(TAG),)
 	TAG := dev
